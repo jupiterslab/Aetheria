@@ -12,34 +12,34 @@
    AETHERIA — MASTER COLOR SYSTEM & TOKENS
 ═══════════════════════════════════════════════ */
 :root {
-  /* DESERT PALETTE  */
-  --des-sky-top:    #5A3A14; /* Darkest amber-brown sky [cite: 405] */
-  --des-sky-mid:    #C4904A; /* Warm haze midpoint [cite: 406] */
-  --des-sand-near:  #4A3010; /* Dark foreground sand [cite: 407] */
-  --des-sand-far:   #8B6030; /* Mid-distance sand [cite: 408] */
-  --des-rock:       #5A4025; /* Mountain and stone [cite: 409] */
-  --des-shadow:     #2C1A08; /* Deep shadow dark [cite: 410] */
-  --des-bone:       #F0E0C0; /* High contrast text / bone [cite: 411] */
+  /* DESERT PALETTE */
+  --des-sky-top:    #5A3A14; 
+  --des-sky-mid:    #C4904A; 
+  --des-sand-near:  #4A3010; 
+  --des-sand-far:   #8B6030; 
+  --des-rock:       #5A4025; 
+  --des-shadow:     #2C1A08; 
+  --des-bone:       #F0E0C0; 
   
-  /* OASIS PALETTE [cite: 412] */
-  --oas-jungle-deep: #051A0A; [cite: 413]
-  --oas-nile:        #1A5A6A; [cite: 414]
-  --oas-water:       #4ECDC4; [cite: 415]
-  --oas-jungle-mid:  #1A5A28; [cite: 416]
-  --oas-leaf:        #2A7A38; [cite: 417]
-  --oas-amber:       #D4820A; [cite: 418]
-  --oas-gold:        #C4944A; [cite: 419]
-  --oas-cream:       #F0E0C0; [cite: 420]
+  /* OASIS PALETTE */
+  --oas-jungle-deep: #051A0A;
+  --oas-nile:        #1A5A6A;
+  --oas-water:       #4ECDC4;
+  --oas-jungle-mid:  #1A5A28;
+  --oas-leaf:        #2A7A38;
+  --oas-amber:       #D4820A;
+  --oas-gold:        #C4944A;
+  --oas-cream:       #F0E0C0;
 
-  /* MIDNIGHT PALETTE [cite: 421] */
-  --mid-void:        #020408; [cite: 422]
-  --mid-purple-deep: #12082A; [cite: 423]
-  --mid-purple:      #2A0A5A; [cite: 424]
-  --mid-violet:      #8B3ACA; [cite: 425]
-  --mid-glow:        #C084FC; [cite: 426]
-  --mid-teal-elec:   #00FFE0; [cite: 427]
-  --mid-teal:        #4ECDC4; [cite: 428]
-  --mid-gold:        #FFB84D; [cite: 429]
+  /* MIDNIGHT PALETTE */
+  --mid-void:        #020408;
+  --mid-purple-deep: #12082A;
+  --mid-purple:      #2A0A5A;
+  --mid-violet:      #8B3ACA;
+  --mid-glow:        #C084FC;
+  --mid-teal-elec:   #00FFE0;
+  --mid-teal:        #4ECDC4;
+  --mid-gold:        #FFB84D;
 }
 
 /* ── GLOBAL RESET & INFRASTRUCTURE ── */
@@ -47,18 +47,18 @@
 html { scroll-behavior: smooth; background-color: var(--mid-void); }
 
 body {
-  font-family: 'Rajdhani', sans-serif; [cite: 395]
+  font-family: 'Rajdhani', sans-serif;
   overflow-x: hidden;
   color: var(--des-bone);
   background: var(--des-sky-top);
   cursor: none;
 }
 
-/* ── TYPOGRAPHY UTILITIES [cite: 385] ── */
-.font-display { font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 0.15em; } [cite: 387, 388]
-.font-editorial { font-family: 'Cormorant Garamond', serif; font-style: italic; } [cite: 391, 392]
-.font-ui { font-family: 'Rajdhani', sans-serif; font-weight: 500; } [cite: 395]
-.font-scribe { font-family: 'Lora', serif; line-height: 1.75; } [cite: 399, 402]
+/* ── TYPOGRAPHY UTILITIES ── */
+.font-display { font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 0.15em; }
+.font-editorial { font-family: 'Cormorant Garamond', serif; font-style: italic; }
+.font-ui { font-family: 'Rajdhani', sans-serif; font-weight: 500; }
+.font-scribe { font-family: 'Lora', serif; line-height: 1.75; }
 
 /* ── IMMERSIVE UTILITIES ── */
 .cursor {
@@ -93,11 +93,11 @@ body {
   border: 1px solid rgba(240, 224, 192, 0.12);
 }
 .theme-btn {
-  font-family: 'Cinzel', serif; [cite: 387]
+  font-family: 'Cinzel', serif;
   font-size: 10px; font-weight: 700; letter-spacing: 1px;
   padding: 8px 16px; border-radius: 30px; border: none;
   cursor: pointer; background: transparent; color: rgba(240, 224, 192, 0.4);
-  min-height: 44px; /* WCAG Target [cite: 451] */
+  min-height: 44px;
   transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .theme-btn.active { color: var(--des-shadow); background: var(--des-sky-mid); font-weight: 900; }
@@ -106,7 +106,7 @@ body {
 .world.active { display: block; }
 
 /* ════════════════════════════════════════
-   THE GOLDEN DESERT — LANDING STATE [cite: 298]
+   THE GOLDEN DESERT — LANDING STATE
 ════════════════════════════════════════ */
 .desert-hero {
   position: relative;
@@ -117,7 +117,7 @@ body {
   justify-content: space-between;
 }
 
-/* Atmospheric Volumetric Sky [cite: 303, 304] */
+/* Atmospheric Volumetric Sky */
 .d-sky-atmosphere {
   position: absolute;
   inset: 0;
@@ -125,7 +125,7 @@ body {
   z-index: 1;
 }
 
-/* Cinematic Sun Bloom Layer  */
+/* Cinematic Sun Bloom Layer */
 .d-sun-bloom {
   position: absolute;
   top: -10%; right: 15%;
@@ -136,7 +136,7 @@ body {
   pointer-events: none;
 }
 
-/* Active SVG Heat Haze Layer [cite: 305, 439] */
+/* Active SVG Heat Haze Layer */
 .d-heat-warp {
   position: absolute;
   inset: 0;
@@ -145,7 +145,7 @@ body {
   pointer-events: none;
 }
 
-/* Layered Mountains [cite: 306] */
+/* Layered Mountains */
 .d-mountain-range {
   position: absolute;
   bottom: 25%; left: 0; width: 100%; height: 35vh;
@@ -168,7 +168,7 @@ body {
   filter: drop-shadow(0 -10px 30px rgba(44, 26, 8, 0.5));
 }
 
-/* Volumetric Dunes (Chiaroscuro Light Mapping) [cite: 307] */
+/* Volumetric Dunes (Chiaroscuro Light Mapping) */
 .d-dunes-container {
   position: absolute;
   bottom: 0; left: 0; width: 100%; height: 32vh;
@@ -179,7 +179,6 @@ body {
   position: absolute;
   bottom: -2px; width: 120%; height: 120%;
 }
-/* Dune 1: Right-oriented afternoon lighting shadowfall  */
 .d-dune-left {
   left: -10%;
   background: linear-gradient(135deg, var(--des-sand-far) 30%, var(--des-shadow) 75%);
@@ -193,7 +192,7 @@ body {
   width: 70%;
 }
 
-/* Sand Ripples Overlay Texture [cite: 307] */
+/* Sand Ripples Overlay Texture */
 .d-sand-ripples {
   position: absolute;
   inset: 0;
@@ -201,14 +200,14 @@ body {
   background-image: repeating-linear-gradient(165deg, transparent, transparent 4px, var(--des-bone) 4px, var(--des-bone) 6px);
 }
 
-/* Particle Systems  */
+/* Particle Systems */
 #d-dust-canvas {
   position: absolute;
   inset: 0; z-index: 7;
   pointer-events: none;
 }
 
-/* Core Interface Content [cite: 311] */
+/* Core Interface Content */
 .d-content-wrapper {
   position: relative;
   z-index: 10;
@@ -229,7 +228,7 @@ body {
   margin-bottom: 24px;
 }
 
-/* Etched In Stone Header Typography  */
+/* Etched In Stone Header Typography */
 .d-main-title {
   font-size: clamp(4rem, 10vw, 8rem);
   font-weight: 900;
@@ -238,7 +237,6 @@ body {
   letter-spacing: 0.22em;
   margin-left: 0.11em;
   position: relative;
-  /* AAA Engraving Illusion Shader  */
   text-shadow: 
     -1px -1px 1px rgba(0, 0, 0, 0.8), 
     1px 1px 1px rgba(255, 235, 180, 0.2),
@@ -269,7 +267,7 @@ body {
   text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
-/* Highly Tactile Game Button Interface [cite: 311, 451] */
+/* Highly Tactile Game Button Interface */
 .d-primary-cta {
   background: linear-gradient(to bottom, #7A5020 0%, var(--des-shadow) 100%);
   border: 1px solid rgba(212, 168, 96, 0.35);
@@ -282,7 +280,7 @@ body {
   box-shadow: 
     0 10px 30px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255,255,255,0.05);
-  min-height: 48px; min-width: 200px; /* WCAG [cite: 451] */
+  min-height: 48px; min-width: 200px;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .d-primary-cta:hover {
@@ -337,26 +335,25 @@ body {
     <canvas id="d-dust-canvas"></canvas>
 
     <div class="d-content-wrapper">
-      <div class="d-studio-label font-ui">Jupiter's Lab Creative Studio</div> [cite: 395]
-      <h1 class="d-main-title font-display">Aetheria</h1> [cite: 387]
-      <p class="d-hero-tagline font-editorial">A different timeline on the same planet</p> [cite: 391]
+      <div class="d-studio-label font-ui">Jupiter's Lab Creative Studio</div>
+      <h1 class="d-main-title font-display">Aetheria</h1>
+      <p class="d-hero-tagline font-editorial">A different timeline on the same planet</p>
       
       <div class="d-architectural-divider"></div>
       
-      <p class="d-narrative-block font-editorial"> [cite: 391]
+      <p class="d-narrative-block font-editorial">
         You have been building alone. <br>
         In the heat. Without shelter. <br>
-        Without anyone who understands. [cite: 313]
+        Without anyone who understands.
       </p>
       
-      <button class="d-primary-cta font-display" id="enterBtn">Apply to Enter</button> [cite: 387]
-      <p class="d-footer-subtext font-ui">The oasis is real &nbsp;·&nbsp; Builders only</p> [cite: 314, 395]
+      <button class="d-primary-cta font-display" id="enterBtn">Apply to Enter</button>
+      <p class="d-footer-subtext font-ui">The oasis is real &nbsp;·&nbsp; Builders only</p>
     </div>
   </section>
 </div>
 
 <script>
-/* ── CINEMATIC INPUT INTERFACE ── */
 const C = document.getElementById('C');
 const CR = document.getElementById('CR');
 let mx = 0, my = 0, rx = 0, ry = 0;
@@ -379,13 +376,11 @@ document.addEventListener('mousemove', e => {
 C.style.background = 'var(--des-sky-mid)';
 C.style.boxShadow = '0 0 15px #FFD060, 0 0 30px #C4904A';
 
-/* ── HIGH VISIBILITY HOVER STATES [cite: 457] ── */
 document.querySelectorAll('button').forEach(el => {
   el.addEventListener('mouseenter', () => { C.style.transform = 'translate(-50%,-50%) scale(2.5)'; });
   el.addEventListener('mouseleave', () => { C.style.transform = 'translate(-50%,-50%) scale(1)'; });
 });
 
-/* ── GAME ENGINE RENDERING: DUST FLUIDITY  ── */
 const canvas = document.getElementById('d-dust-canvas');
 const ctx = canvas.getContext('2d');
 
