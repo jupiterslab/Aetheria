@@ -747,13 +747,7 @@ const FIELDS = {
   if (profile) {
     currentProfile = profile
 
-    // If already complete and active go to dashboard
-    if (profile.profile_complete && profile.status === 'active') {
-      window.location.href = '/Aetheria/dashboard.html'
-      return
-    }
-
-    // Pre-fill fields with existing data
+    // Pre-fill fields with existing data regardless
     prefillFields(profile)
   }
 
