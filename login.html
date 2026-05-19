@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Aetheria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sand-dark:#3D2010;--sand-mid:#6B4020;--rock:#5A4025;
+  --bone:#F0E0C0;--gold:#C4944A;--amber:#D4820A;
+  --text-dark:#1A0C04;--text-mid:#3D2010;--text-muted:rgba(26,12,4,0.5);
+  --border:rgba(139,90,42,0.25);--input-bg:rgba(245,236,216,0.7);
+  --card-bg:rgba(245,236,216,0.88);--error:#8B2020;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{background:#5A3A14;}
+body{
+  font-family:'Rajdhani',sans-serif;min-height:100vh;
+  background:linear-gradient(180deg,#5A3A14 0%,#8B5A22 10%,#B07830 20%,#C4904A 30%,#D4A860 40%,#C89050 50%,#A06830 60%,#784820 70%,#5A3418 80%,#3D2210 100%);
+  display:flex;align-items:center;justify-content:center;
+  padding:40px 20px;cursor:none;position:relative;overflow-x:hidden;
+}
+.cursor{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px rgba(212,130,10,.6);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+.cursor-ring{position:fixed;width:26px;height:26px;border-radius:50%;border:1px solid rgba(196,148,74,.4);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+.bg-sun{position:fixed;top:8%;right:26%;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,#FFFAE0 0%,#FFE080 25%,#FFB840 55%,rgba(255,100,0,0) 100%);box-shadow:0 0 50px rgba(255,160,40,.5),0 0 100px rgba(255,120,20,.25);pointer-events:none;animation:sp 5s ease-in-out infinite;}
+@keyframes sp{0%,100%{box-shadow:0 0 50px rgba(255,160,40,.5)}50%{box-shadow:0 0 80px rgba(255,160,40,.7)}}
+.bg-mtn{position:fixed;bottom:20%;left:10%;right:10%;height:160px;background:linear-gradient(180deg,#4A3018 0%,#2C1808 60%,#1A0C04 100%);clip-path:polygon(0% 100%,5% 55%,15% 25%,25% 50%,35% 8%,45% 38%,55% 18%,65% 42%,75% 22%,85% 48%,95% 32%,100% 45%,100% 100%);pointer-events:none;}
+.bg-dune{position:fixed;bottom:0;width:110%;left:-5%;height:140px;background:linear-gradient(180deg,#C4844A 0%,#8B5A2A 60%,#6B3A18 100%);border-radius:60% 40% 0 0/35% 28% 0 0;pointer-events:none;}
+.wrap{position:relative;z-index:10;width:100%;max-width:460px;}
+.hdr{text-align:center;margin-bottom:24px;}
+.logo{font-family:'Cinzel',serif;font-size:38px;font-weight:900;letter-spacing:10px;color:var(--sand-dark);text-shadow:1px 1px 0 rgba(245,230,204,.3),-1px -1px 0 rgba(20,10,4,.4);margin-bottom:4px;}
+.sub{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--text-muted);}
+.card{background:var(--card-bg);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:2px;padding:32px 28px;box-shadow:0 8px 40px rgba(0,0,0,.2);backdrop-filter:blur(8px);}
+.eyebrow{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--amber);margin-bottom:6px;}
+.title{font-family:'Cinzel',serif;font-size:20px;font-weight:600;letter-spacing:2px;color:var(--text-dark);margin-bottom:22px;}
+.fg{margin-bottom:16px;}
+.lbl{display:block;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text-mid);margin-bottom:5px;}
+.inp{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:2px;padding:12px 14px;font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--text-dark);outline:none;transition:border-color .2s,box-shadow .2s;}
+.inp::placeholder{color:rgba(26,12,4,.3);}
+.inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,148,74,.15);}
+.alert{padding:11px 14px;border-radius:2px;font-size:14px;margin-bottom:14px;display:none;}
+.alert.active{display:block;}
+.alert.error{background:rgba(139,32,32,.1);border:1px solid rgba(139,32,32,.3);color:var(--error);}
+.btn{width:100%;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--bone);background:linear-gradient(180deg,var(--rock) 0%,var(--sand-mid) 40%,var(--sand-dark) 100%);border:none;border-top:1px solid rgba(180,140,80,.3);padding:16px;border-radius:2px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(200,160,80,.15),0 4px 16px rgba(0,0,0,.4);transition:transform .2s;margin-bottom:16px;}
+.btn:hover{transform:translateY(-1px);}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.ftr{text-align:center;padding-top:14px;border-top:1px solid var(--border);}
+.ftr-txt{font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--text-muted);}
+.ftr-link{color:var(--amber);text-decoration:none;font-weight:600;}
+.back{display:block;text-align:center;margin-top:14px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(26,12,4,.35);text-decoration:none;}
+.spinner{width:18px;height:18px;border-radius:50%;border:2px solid rgba(240,224,192,.2);border-top-color:var(--bone);animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="cursor" id="C"></div>
+<div class="cursor-ring" id="CR"></div>
+<div class="bg-sun"></div>
+<div class="bg-mtn"></div>
+<div class="bg-dune"></div>
+
+<div class="wrap">
+  <div class="hdr">
+    <div class="logo">AETHERIA</div>
+    <div class="sub">Return to the oasis</div>
+  </div>
+  <div class="card">
+    <div class="eyebrow">Welcome Back</div>
+    <div class="title">Sign In</div>
+    <div class="alert" id="alertMsg"></div>
+    <div class="fg">
+      <label class="lbl" for="email">Email Address</label>
+      <input class="inp" type="email" id="email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="fg">
+      <label class="lbl" for="password">Password</label>
+      <input class="inp" type="password" id="password" placeholder="Your password" autocomplete="current-password">
+    </div>
+    <button class="btn" id="signinBtn" onclick="signIn()">Enter Aetheria</button>
+    <div class="ftr">
+      <div class="ftr-txt">Not yet a builder? <a href="/Aetheria/apply.html" class="ftr-link">Apply Now</a></div>
+    </div>
+  </div>
+  <a href="/Aetheria/index.html" class="back">← Back to the Desert</a>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+const supabase = createClient(
+  'https://fenilyhufciuonhldpxo.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlbmlseWh1ZmNpdW9uaGxkcHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzgwNzQsImV4cCI6MjA5NDQxNDA3NH0.8_NWxnOMhOyhCXSTbdmQ7bR562cH6b74Vz4DO_73CYI'
+)
+const C=document.getElementById('C'),CR=document.getElementById('CR')
+let mx=0,my=0,rx=0,ry=0
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px'})
+;(function aR(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(aR)})()
+
+;(async()=>{
+  const {data:{session}}=await supabase.auth.getSession()
+  if(session){
+    const {data:p}=await supabase.from('users').select('profile_complete,status').eq('id',session.user.id).single()
+    if(p?.status==='active'&&p?.profile_complete) window.location.href='/Aetheria/dashboard.html'
+    else if(p?.status==='active') window.location.href='/Aetheria/profile.html'
+  }
+})()
+
+document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()})
+
+window.signIn=async function(){
+  const email=document.getElementById('email').value.trim()
+  const password=document.getElementById('password').value
+  const btn=document.getElementById('signinBtn')
+  const alert=document.getElementById('alertMsg')
+  if(!email||!password){alert.textContent='Please enter your email and password';alert.className='alert error active';return}
+  btn.disabled=true
+  btn.innerHTML='<span class="spinner"></span>Entering...'
+  const {data,error}=await supabase.auth.signInWithPassword({email,password})
+  if(error){
+    alert.textContent=error.message==='Invalid login credentials'?'Email or password is incorrect.':error.message
+    alert.className='alert error active'
+    btn.disabled=false;btn.textContent='Enter Aetheria';return
+  }
+  const {data:p}=await supabase.from('users').select('profile_complete,status').eq('id',data.user.id).single()
+  if(p?.status==='active'&&p?.profile_complete) window.location.href='/Aetheria/dashboard.html'
+  else if(p?.status==='active') window.location.href='/Aetheria/profile.html'
+  else{
+    alert.textContent='Your application is still under review.'
+    alert.className='alert error active'
+    btn.disabled=false;btn.textContent='Enter Aetheria'
+  }
+}
+</script>
+</body>
+</html>
