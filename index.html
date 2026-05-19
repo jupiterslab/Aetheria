@@ -1510,7 +1510,8 @@ body {
       <p class="d-tagline">A different timeline on the same planet</p>
       <div class="d-line"></div>
       <p class="d-lone">You have been building alone.<br>In the heat. Without shelter.<br>Without anyone who understands.</p>
-      <button class="d-btn" id="enterBtn">Enter Aetheria</button>
+      <a href="/Aetheria/apply.html" class="d-btn" id="enterBtn">Apply Now</a>
+      <p class="d-sub" style="margin-top:10px;">Already a member? <a href="/Aetheria/dashboard.html" style="color:rgba(44,26,8,.5);text-decoration:underline;font-family:Cinzel,serif;font-size:10px;letter-spacing:2px;">Sign In</a></p>
       <p class="d-sub">The oasis is real &nbsp;·&nbsp; Builders only</p>
     </div>
   </section>
@@ -1559,7 +1560,7 @@ body {
       <h1 class="o-title">AETHERIA</h1>
       <p class="o-tagline">The oasis was always <span>real</span></p>
       <p class="o-relief">After the long walk. After the heat and the silence.<br>You stumbled upon the Nile.<br>Green. Water. Life. Others who have been building.<br>This is home.</p>
-      <button class="o-btn">Begin Building</button>
+      <a href="/Aetheria/apply.html" class="o-btn" style="display:inline-block;text-decoration:none;">Apply Now</a>
     </div>
   </section>
   <div class="o-section">
@@ -1733,11 +1734,7 @@ function wormhole(target,cb){
 }
 
 /* ── BUTTONS ── */
-document.getElementById('enterBtn').addEventListener('click',()=>{
-  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelector('[data-theme="oasis"]').classList.add('active');
-  wormhole('oasis');
-});
+// enterBtn is now a direct link to apply.html
 
 document.querySelectorAll('.theme-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
