@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scribe — Aetheria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   AETHERIA — SCRIBE
+   The Thinking Layer · Words Only
+   Midnight Theme
+═══════════════════════════════════════ */
+:root {
+  --void:#020408;--deep:#06080F;--surface:#0A0A18;
+  --purple-1:#12082A;--purple-2:#2A0A5A;--purple-3:#5A1A9A;
+  --violet:#8B3ACA;--glow:#C084FC;--teal:#00FFE0;--teal-2:#4ECDC4;
+  --gold:#FFB84D;--amber:#FF8C00;
+  --text-1:#F0EAFF;--text-2:rgba(240,234,255,.6);--text-3:rgba(240,234,255,.3);
+  --border:rgba(90,26,154,.2);--card-bg:rgba(8,8,24,.85);
+
+  /* Post type colors */
+  --q-color:#4ECDC4;    /* question */
+  --i-color:#FFD080;    /* insight */
+  --m-color:#C084FC;    /* motivator */
+  --o-color:#FF8C00;    /* observation */
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--void);}
+body{
+  font-family:'Rajdhani',sans-serif;min-height:100vh;
+  background:linear-gradient(180deg,#06040E 0%,#0A0818 30%,#080410 60%,#020408 100%);
+  cursor:none;display:flex;flex-direction:column;
+}
+.cursor{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px rgba(0,255,224,.6);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;}
+.cursor-ring{position:fixed;width:26px;height:26px;border-radius:50%;border:1px solid rgba(0,255,224,.3);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+
+/* Background stars */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;border-radius:50%;background:white;animation:twinkle var(--d) ease-in-out infinite var(--dl);}
+@keyframes twinkle{0%,100%{opacity:var(--mn)}50%{opacity:var(--mx)}}
+
+/* Energy grid */
+.grid-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(90,26,154,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(90,26,154,.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse at center,black 20%,transparent 75%);
+  animation:grid-pulse 5s ease-in-out infinite;
+}
+@keyframes grid-pulse{0%,100%{opacity:.4}50%{opacity:.8}}
+
+/* ── TOP NAV ── */
+.top-nav{
+  position:sticky;top:0;z-index:500;
+  background:rgba(2,4,8,.97);border-bottom:1px solid var(--border);
+  padding:0 20px;display:flex;align-items:center;height:56px;gap:16px;
+  flex-shrink:0;
+}
+.nav-logo{
+  font-family:'Cinzel',serif;font-size:18px;font-weight:900;letter-spacing:6px;
+  background:linear-gradient(135deg,var(--text-1),var(--glow));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.nav-title{
+  font-family:'Cormorant Garamond',serif;font-size:16px;
+  font-style:italic;color:var(--text-2);letter-spacing:2px;
+}
+.nav-sub{
+  font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:600;
+  letter-spacing:3px;text-transform:uppercase;color:var(--text-3);
+  margin-left:4px;
+}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.nav-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-3),var(--purple-1));
+  border:1.5px solid rgba(139,58,202,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;overflow:hidden;
+  box-shadow:0 0 10px rgba(139,58,202,.2);
+}
+
+/* ── TABS ── */
+.scribe-tabs{
+  background:rgba(2,4,8,.9);border-bottom:1px solid var(--border);
+  display:flex;padding:0 20px;overflow-x:auto;scrollbar-width:none;
+  flex-shrink:0;
+}
+.scribe-tabs::-webkit-scrollbar{display:none;}
+.scribe-tab{
+  font-family:'Cinzel',serif;font-size:10px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;color:var(--text-3);
+  padding:12px 18px;border:none;background:transparent;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.scribe-tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.scribe-tab:hover{color:var(--text-2);}
+.tab-dot{width:6px;height:6px;border-radius:50%;}
+
+/* ── MAIN ── */
+.main{
+  flex:1;max-width:680px;margin:0 auto;
+  width:100%;padding:20px 16px 100px;
+  position:relative;z-index:1;
+}
+
+/* ── SCRIBE CARD ── */
+.scribe-card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:2px;margin-bottom:14px;
+  overflow:hidden;position:relative;
+  transition:border-color .2s;
+}
+.scribe-card:hover{border-color:rgba(139,58,202,.3);}
+
+/* Left accent bar by type */
+.scribe-card::before{
+  content:'';position:absolute;top:0;left:0;width:3px;height:100%;
+}
+.scribe-card.question::before{background:var(--q-color);}
+.scribe-card.insight::before{background:var(--i-color);}
+.scribe-card.motivator::before{background:var(--m-color);}
+.scribe-card.observation::before{background:var(--o-color);}
+
+/* Inner glow by type */
+.scribe-card.question{box-shadow:inset 3px 0 20px rgba(78,205,196,.04);}
+.scribe-card.insight{box-shadow:inset 3px 0 20px rgba(255,208,128,.03);}
+.scribe-card.motivator{box-shadow:inset 3px 0 20px rgba(192,132,252,.04);}
+.scribe-card.observation{box-shadow:inset 3px 0 20px rgba(255,140,0,.03);}
+
+.scribe-inner{padding:20px 20px 14px 24px;}
+
+/* Post type header */
+.scribe-type-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.scribe-type-tag{
+  font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;border:1px solid;display:flex;
+  align-items:center;gap:5px;
+}
+.tag-q{color:var(--q-color);border-color:rgba(78,205,196,.3);background:rgba(78,205,196,.06);}
+.tag-i{color:var(--i-color);border-color:rgba(255,208,128,.3);background:rgba(255,208,128,.06);}
+.tag-m{color:var(--m-color);border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.06);}
+.tag-o{color:var(--o-color);border-color:rgba(255,140,0,.3);background:rgba(255,140,0,.06);}
+
+.scribe-time{
+  font-family:'Rajdhani',sans-serif;font-size:10px;
+  letter-spacing:1px;color:var(--text-3);
+}
+
+/* Post body — Lora for readability */
+.scribe-body{
+  font-family:'Lora',serif;font-size:16px;font-weight:400;
+  color:var(--text-1);line-height:1.8;
+  margin-bottom:16px;letter-spacing:.15px;
+}
+
+/* Author row */
+.scribe-author{
+  display:flex;align-items:center;gap:10px;
+  padding-top:12px;border-top:1px solid rgba(90,26,154,.1);
+  margin-bottom:12px;
+}
+.scribe-avatar{
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid rgba(139,58,202,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;overflow:hidden;background:rgba(18,8,42,.8);
+  flex-shrink:0;
+}
+.scribe-author-info{}
+.scribe-author-name{
+  font-family:'Cinzel',serif;font-size:11px;
+  letter-spacing:1px;color:var(--teal-2);margin-bottom:1px;
+}
+.scribe-author-project{
+  font-family:'Rajdhani',sans-serif;font-size:11px;
+  color:var(--text-3);font-style:italic;
+}
+
+/* Actions */
+.scribe-actions{
+  display:flex;gap:0;
+}
+.scribe-action{
+  display:flex;align-items:center;gap:5px;
+  font-family:'Cinzel',serif;font-size:9px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;color:var(--text-3);
+  border:none;background:transparent;cursor:pointer;
+  padding:4px 14px 4px 0;transition:color .2s;
+}
+.scribe-action:hover{color:var(--teal);}
+
+/* ── COMPOSE BUTTON ── */
+.compose-btn{
+  position:fixed;bottom:80px;right:20px;z-index:400;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--teal),var(--teal-2));
+  border:none;cursor:pointer;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(0,255,224,.3);
+  transition:transform .2s;color:var(--void);font-weight:700;
+}
+.compose-btn:hover{transform:scale(1.1);}
+
+/* ── COMPOSE MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(2,4,8,.88);backdrop-filter:blur(10px);
+  display:none;align-items:flex-end;justify-content:center;
+}
+.modal-overlay.active{display:flex;}
+.modal{
+  width:100%;max-width:680px;
+  background:rgba(4,2,14,.98);
+  border:1px solid var(--border);border-top:2px solid var(--teal);
+  border-radius:2px 2px 0 0;padding:24px;
+  animation:mu .3s ease;max-height:92vh;overflow-y:auto;
+}
+@keyframes mu{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--text-1);margin-bottom:4px;}
+.modal-sub{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--text-3);margin-bottom:20px;}
+
+/* Type selector */
+.type-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.type-opt{
+  padding:14px 12px;border-radius:2px;border:1px solid var(--border);
+  cursor:pointer;transition:all .2s;text-align:center;
+  background:rgba(18,8,42,.4);
+}
+.type-opt:hover{border-color:rgba(0,255,224,.2);}
+.type-opt.selected{border-color:var(--teal);background:rgba(0,255,224,.06);}
+.type-opt-icon{font-size:22px;margin-bottom:6px;}
+.type-opt-name{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-2);display:block;margin-bottom:2px;}
+.type-opt.selected .type-opt-name{color:var(--teal);}
+.type-opt-desc{font-size:11px;color:var(--text-3);font-style:italic;}
+
+.modal-field{margin-bottom:16px;}
+.modal-label{display:block;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text-2);margin-bottom:6px;}
+.modal-textarea{
+  width:100%;background:rgba(18,8,42,.6);
+  border:1px solid var(--border);border-radius:2px;
+  padding:14px;font-family:'Lora',serif;font-size:15px;
+  color:var(--text-1);line-height:1.75;resize:vertical;
+  min-height:140px;outline:none;transition:border-color .2s;
+  letter-spacing:.1px;
+}
+.modal-textarea::placeholder{color:var(--text-3);font-family:'Rajdhani',sans-serif;font-size:14px;}
+.modal-textarea:focus{border-color:rgba(0,255,224,.3);}
+
+.char-count{
+  text-align:right;font-family:'Rajdhani',sans-serif;
+  font-size:11px;letter-spacing:1px;color:var(--text-3);
+  margin-top:6px;transition:color .2s;
+}
+.char-count.min-met{color:var(--teal);}
+.char-count.over{color:#E05A5A;}
+
+.modal-rule{
+  font-family:'Rajdhani',sans-serif;font-size:12px;
+  color:var(--text-3);font-style:italic;
+  margin-bottom:16px;padding:10px 14px;
+  border:1px solid rgba(0,255,224,.08);border-radius:2px;
+  background:rgba(0,255,224,.03);
+}
+
+.modal-actions{display:flex;gap:10px;margin-top:16px;}
+.btn-post{
+  flex:1;font-family:'Cinzel',serif;font-size:11px;font-weight:700;
+  letter-spacing:4px;text-transform:uppercase;color:var(--void);
+  background:linear-gradient(135deg,var(--teal),var(--teal-2));
+  border:none;border-radius:2px;padding:15px;cursor:pointer;transition:all .2s;
+}
+.btn-post:disabled{opacity:.3;cursor:not-allowed;}
+.btn-cancel{
+  font-family:'Cinzel',serif;font-size:10px;font-weight:600;
+  letter-spacing:3px;text-transform:uppercase;color:var(--text-3);
+  background:transparent;border:1px solid rgba(255,255,255,.06);
+  border-radius:2px;padding:15px 20px;cursor:pointer;transition:all .2s;
+}
+.btn-cancel:hover{color:var(--text-2);}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 24px;}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:var(--text-2);margin-bottom:8px;}
+.empty-sub{font-size:14px;color:var(--text-3);line-height:1.6;}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:66px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:900;background:rgba(18,8,42,.95);border:1px solid rgba(0,255,224,.3);border-radius:2px;padding:10px 22px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);opacity:0;transition:all .3s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(2,4,8,.97);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 12px;}
+.bottom-tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 16px;cursor:pointer;border:none;background:transparent;}
+.bottom-tab-icon{font-size:20px;line-height:1;}
+.bottom-tab-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);}
+.bottom-tab.active .bottom-tab-label{color:var(--teal);}
+
+@media(max-width:600px){.main{padding:16px 12px 100px;}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="cursor" id="C"></div>
+<div class="cursor-ring" id="CR"></div>
+<div class="stars" id="stars"></div>
+<div class="grid-bg"></div>
+<div class="toast" id="toast"></div>
+
+<nav class="top-nav">
+  <div class="nav-logo">SCRIBE</div>
+  <div>
+    <div class="nav-title">Think out loud.</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-avatar" id="navAvatar">📜</div>
+  </div>
+</nav>
+
+<div class="scribe-tabs">
+  <button class="scribe-tab active" onclick="switchTab('all',this)">
+    <div class="tab-dot" style="background:var(--teal)"></div> All
+  </button>
+  <button class="scribe-tab" onclick="switchTab('question',this)">
+    <div class="tab-dot" style="background:var(--q-color)"></div> Questions
+  </button>
+  <button class="scribe-tab" onclick="switchTab('insight',this)">
+    <div class="tab-dot" style="background:var(--i-color)"></div> Insights
+  </button>
+  <button class="scribe-tab" onclick="switchTab('motivator',this)">
+    <div class="tab-dot" style="background:var(--m-color)"></div> Motivators
+  </button>
+  <button class="scribe-tab" onclick="switchTab('observation',this)">
+    <div class="tab-dot" style="background:var(--o-color)"></div> Observations
+  </button>
+</div>
+
+<div class="main">
+  <div id="scribePosts"></div>
+</div>
+
+<button class="compose-btn" onclick="openCompose()">📜</button>
+
+<div class="modal-overlay" id="composeModal">
+  <div class="modal">
+    <div class="modal-title">Write to Scribe</div>
+    <div class="modal-sub">No images. Words only. Thinking requires no filter.</div>
+
+    <div class="type-selector">
+      <div class="type-opt selected" data-type="question" onclick="selectType(this)">
+        <div class="type-opt-icon">❓</div>
+        <span class="type-opt-name">Question</span>
+        <span class="type-opt-desc">Make people think</span>
+      </div>
+      <div class="type-opt" data-type="insight" onclick="selectType(this)">
+        <div class="type-opt-icon">💡</div>
+        <span class="type-opt-name">Insight</span>
+        <span class="type-opt-desc">Share what you learned</span>
+      </div>
+      <div class="type-opt" data-type="motivator" onclick="selectType(this)">
+        <div class="type-opt-icon">🔥</div>
+        <span class="type-opt-name">Motivator</span>
+        <span class="type-opt-desc">From the trenches</span>
+      </div>
+      <div class="type-opt" data-type="observation" onclick="selectType(this)">
+        <div class="type-opt-icon">🌍</div>
+        <span class="type-opt-name">Observation</span>
+        <span class="type-opt-desc">What you're noticing</span>
+      </div>
+    </div>
+
+    <div class="modal-rule">
+      Minimum 280 characters. Scribe requires you to actually think before you post.
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label" for="scribeContent">What's on your mind?</label>
+      <textarea class="modal-textarea" id="scribeContent" rows="6"
+        placeholder="Write something worth reading..."></textarea>
+      <div class="char-count" id="charCount">0 / 280 minimum</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCompose()">Cancel</button>
+      <button class="btn-post" id="postBtn" disabled onclick="submitPost()">Post to Scribe</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="bottom-tab" onclick="location.href='/Aetheria/dashboard.html'"><div class="bottom-tab-icon">🌍</div><div class="bottom-tab-label">Aetheria</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/feed.html'"><div class="bottom-tab-icon">✦</div><div class="bottom-tab-label">Feed</div></button>
+  <button class="bottom-tab active"><div class="bottom-tab-icon">📜</div><div class="bottom-tab-label">Scribe</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/collab.html'"><div class="bottom-tab-icon">💬</div><div class="bottom-tab-label">Collabs</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/profile.html'"><div class="bottom-tab-icon">◎</div><div class="bottom-tab-label">Profile</div></button>
+</nav>
+
+<script>
+const SUPABASE_URL = 'https://fenilyhufciuonhldpxo.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlbmlseWh1ZmNpdW9uaGxkcHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzgwNzQsImV4cCI6MjA5NDQxNDA3NH0.8_NWxnOMhOyhCXSTbdmQ7bR562cH6b74Vz4DO_73CYI'
+
+// Cursor
+const C=document.getElementById('C'),CR=document.getElementById('CR')
+let mx=0,my=0,rx=0,ry=0
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px'})
+;(function aR(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(aR)})()
+
+// Stars
+const SF=document.getElementById('stars')
+for(let i=0;i<180;i++){
+  const s=document.createElement('div')
+  const sz=Math.random()*2+.4
+  s.style.cssText=`position:absolute;width:${sz}px;height:${sz}px;border-radius:50%;background:white;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--dl:-${Math.random()*6}s;--mn:${.04+Math.random()*.08};--mx:${.2+Math.random()*.5};`
+  s.classList.add('star')
+  SF.appendChild(s)
+}
+
+// State
+let currentTab = 'all'
+let selectedType = 'question'
+let currentUser = null
+
+// Mock posts
+const MOCK = [
+  {id:'s1',post_type:'question',content:'Why is it easier to get funding for an app that helps people order food faster than for a system that grows food in communities that have none? What are we actually optimizing for as a society?',created_at:new Date(Date.now()-1800000).toISOString(),users:{name:'Jey K.',profile_photo:null,what_building:'Aetheria — builder collaboration platform'}},
+  {id:'s2',post_type:'observation',content:'The people solving the world\'s most important problems are the most underfunded, the most isolated, and the least visible. Meanwhile the people creating the most noise have the most resources. We built the wrong incentive system and then wondered why the world is the way it is.',created_at:new Date(Date.now()-7200000).toISOString(),users:{name:'Amara K.',profile_photo:null,what_building:'Soil regeneration system for smallholder farmers'}},
+  {id:'s3',post_type:'motivator',content:'Nobody is coming to save the world. I used to think that was depressing. Now I think it is the best news I have heard in years. It means the door is wide open. It means the only thing standing between the problem and the solution is someone deciding to walk through it. That someone is us.',created_at:new Date(Date.now()-18000000).toISOString(),users:{name:'Dayo O.',profile_photo:null,what_building:'Off-grid energy network for rural West Africa'}},
+  {id:'s4',post_type:'insight',content:'The biggest thing slowing my build is not money. It is not time. It is not even skill. It is not being able to find the one person who has already solved the adjacent problem I am stuck on. That gap between builders is costing humanity more than we know.',created_at:new Date(Date.now()-86400000).toISOString(),users:{name:'Moses W.',profile_photo:null,what_building:'Atmospheric water generators for emergency deployment'}},
+  {id:'s5',post_type:'question',content:'If AI is consuming the same water that communities are running out of — who is responsible for solving that and why isn\'t it the first question every AI company is forced to answer before they scale?',created_at:new Date(Date.now()-172800000).toISOString(),users:{name:'Dr. Sofia M.',profile_photo:null,what_building:'Community health infrastructure in rural Guatemala'}},
+  {id:'s6',post_type:'insight',content:'I stopped telling people what I was building and started showing them. Not because I became more secretive. Because I realized that most people cannot see what does not yet exist. The ones who can — those are your people.',created_at:new Date(Date.now()-259200000).toISOString(),users:{name:'Julian B.',profile_photo:null,what_building:'Plastic to fuel conversion — open source'}},
+]
+
+const TYPE_CONFIG = {
+  question:    {label:'Question',    tagCls:'tag-q', icon:'❓'},
+  insight:     {label:'Insight',     tagCls:'tag-i', icon:'💡'},
+  motivator:   {label:'Motivator',   tagCls:'tag-m', icon:'🔥'},
+  observation: {label:'Observation', tagCls:'tag-o', icon:'🌍'}
+}
+
+function timeAgo(d){
+  const m=Math.floor((Date.now()-new Date(d))/60000)
+  if(m<60)return m+'m ago'
+  const h=Math.floor(m/60)
+  if(h<24)return h+'h ago'
+  return Math.floor(h/24)+'d ago'
+}
+
+function renderPost(p){
+  const u=p.users||{}
+  const av=u.profile_photo?`<img src="${u.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:'📜'
+  const t=TYPE_CONFIG[p.post_type]||TYPE_CONFIG.observation
+  return `
+    <div class="scribe-card ${p.post_type}">
+      <div class="scribe-inner">
+        <div class="scribe-type-row">
+          <div class="scribe-type-tag ${t.tagCls}">${t.icon} ${t.label}</div>
+          <div class="scribe-time">${timeAgo(p.created_at)}</div>
+        </div>
+        <div class="scribe-body">${(p.content||'').replace(/\n/g,'<br>')}</div>
+        <div class="scribe-author">
+          <div class="scribe-avatar">${av}</div>
+          <div class="scribe-author-info">
+            <div class="scribe-author-name">${u.name||'Builder'}</div>
+            <div class="scribe-author-project">${u.what_building||'Building something that matters'}</div>
+          </div>
+        </div>
+        <div class="scribe-actions">
+          <button class="scribe-action">💬 Reply</button>
+          <button class="scribe-action">↗ Amplify</button>
+          <button class="scribe-action">◎ View on Aetheria</button>
+        </div>
+      </div>
+    </div>`
+}
+
+function renderPosts(posts){
+  const el=document.getElementById('scribePosts')
+  const filtered=currentTab==='all'?posts:posts.filter(p=>p.post_type===currentTab)
+  el.innerHTML=filtered.length
+    ?filtered.map(renderPost).join('')
+    :`<div class="empty-state"><div class="empty-title">No ${currentTab}s yet.</div><div class="empty-sub">Be the first to write one.</div></div>`
+}
+
+// Show mock immediately
+renderPosts(MOCK)
+
+// Load real posts
+async function loadReal(){
+  try{
+    const url=`${SUPABASE_URL}/rest/v1/scribe_posts?select=*,users(id,name,profile_photo,what_building)&order=created_at.desc&limit=30`
+    const res=await fetch(url,{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}})
+    const data=await res.json()
+    if(Array.isArray(data)&&data.length>0) renderPosts(data)
+  }catch(e){}
+}
+loadReal()
+
+// Tab switch
+function switchTab(tab,el){
+  currentTab=tab
+  document.querySelectorAll('.scribe-tab').forEach(t=>t.classList.remove('active'))
+  el.classList.add('active')
+  renderPosts(MOCK)
+  loadReal()
+}
+
+// Compose
+function openCompose(){document.getElementById('composeModal').classList.add('active')}
+function closeCompose(){
+  document.getElementById('composeModal').classList.remove('active')
+  document.getElementById('scribeContent').value=''
+  document.getElementById('charCount').textContent='0 / 280 minimum'
+  document.getElementById('charCount').className='char-count'
+  document.getElementById('postBtn').disabled=true
+}
+
+function selectType(el){
+  document.querySelectorAll('.type-opt').forEach(o=>o.classList.remove('selected'))
+  el.classList.add('selected')
+  selectedType=el.dataset.type
+}
+
+// Character counter
+document.getElementById('scribeContent').addEventListener('input',function(){
+  const len=this.value.length
+  const counter=document.getElementById('charCount')
+  const btn=document.getElementById('postBtn')
+  if(len>=280){
+    counter.textContent=`${len} characters ✓`
+    counter.className='char-count min-met'
+    btn.disabled=false
+  } else {
+    counter.textContent=`${len} / 280 minimum`
+    counter.className='char-count'
+    btn.disabled=true
+  }
+})
+
+async function submitPost(){
+  const content=document.getElementById('scribeContent').value.trim()
+  if(content.length<280){showToast('Minimum 280 characters');return}
+  const btn=document.getElementById('postBtn')
+  btn.disabled=true;btn.textContent='Posting...'
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/scribe_posts`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({user_id:currentUser||'demo',post_type:selectedType,content})
+    })
+    closeCompose()
+    showToast('Posted to Scribe')
+    loadReal()
+  }catch(e){showToast('Something went wrong')}
+  btn.disabled=false;btn.textContent='Post to Scribe'
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast')
+  t.textContent=msg;t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2500)
+}
+
+// Auth in background
+;(async()=>{
+  try{
+    const res=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}})
+    const u=await res.json()
+    if(u&&u.id){currentUser=u.id}
+  }catch(e){}
+})()
+</script>
+</body>
+</html>
