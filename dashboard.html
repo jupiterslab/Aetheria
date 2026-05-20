@@ -3,1351 +3,296 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aetheria — The World Map</title>
+<title>The Feed — Aetheria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Leaflet for the map -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-
-/* ═══════════════════════════════════════
-   AETHERIA — WORLD MAP DASHBOARD
-   Oasis Theme · Living World
-═══════════════════════════════════════ */
-
 :root {
-  --jungle-1:   #041008;
-  --jungle-2:   #0A3018;
-  --nile:       #1A5A6A;
-  --water:      #4ECDC4;
-  --water-2:    #2A8A7A;
-  --amber:      #D4820A;
-  --gold:       #C4944A;
-  --gold-2:     #FFD080;
-  --cream:      #F0E0C0;
-  --text-1:     #F0E8D0;
-  --text-2:     rgba(240,232,208,.65);
-  --text-3:     rgba(240,232,208,.35);
-  --border:     rgba(78,205,196,.12);
-  --card-bg:    rgba(4,16,8,.92);
-  --surface:    rgba(10,48,24,.8);
-  --purple:     #8B3ACA;
-
-  /* Impact area colors */
-  --c-climate:  #4ECDC4;
-  --c-health:   #FF6B9D;
-  --c-edu:      #FFD080;
-  --c-tech:     #9B59B6;
-  --c-infra:    #E67E22;
-  --c-food:     #27AE60;
-  --c-water:    #3498DB;
-  --c-energy:   #F1C40F;
-  --c-other:    #95A5A6;
-}
-
-*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
-html,body { height:100%; overflow:hidden; background:var(--jungle-1); }
-
-body {
-  font-family:'Rajdhani',sans-serif;
-  cursor:none;
-  display:flex; flex-direction:column;
-}
-
-/* ── CURSOR ── */
-.cursor {
-  position:fixed; width:8px; height:8px;
-  border-radius:50%; background:var(--water);
-  box-shadow:0 0 10px rgba(78,205,196,.6);
-  pointer-events:none; z-index:9999;
-  transform:translate(-50%,-50%);
-  transition:width .2s, height .2s;
-  mix-blend-mode:screen;
-}
-.cursor-ring {
-  position:fixed; width:26px; height:26px;
-  border-radius:50%; border:1px solid rgba(78,205,196,.3);
-  pointer-events:none; z-index:9998;
-  transform:translate(-50%,-50%);
-}
-
-/* ── TOP NAV ── */
-.top-nav {
-  position:relative; z-index:500;
-  background:linear-gradient(180deg,rgba(4,16,8,.98) 0%,rgba(4,16,8,.9) 100%);
-  border-bottom:1px solid var(--border);
-  padding:0 20px;
-  display:flex; align-items:center;
-  height:56px; gap:16px; flex-shrink:0;
-}
-
-.nav-logo {
-  font-family:'Cinzel',serif; font-size:18px;
-  font-weight:900; letter-spacing:6px;
-  background:linear-gradient(135deg,var(--cream),var(--gold));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  background-clip:text; white-space:nowrap; flex-shrink:0;
-}
-
-/* Search bar */
-.search-wrap {
-  flex:1; max-width:420px; position:relative;
-}
-
-.search-input {
-  width:100%; background:rgba(10,48,24,.7);
-  border:1px solid var(--border); border-radius:2px;
-  padding:8px 14px 8px 36px;
-  font-family:'Rajdhani',sans-serif; font-size:15px;
-  color:var(--text-1); outline:none;
-  transition:border-color .2s, background .2s;
-}
-.search-input::placeholder { color:var(--text-3); }
-.search-input:focus {
-  border-color:rgba(78,205,196,.4);
-  background:rgba(10,48,24,.9);
-}
-
-.search-icon {
-  position:absolute; left:10px; top:50%;
-  transform:translateY(-50%);
-  color:var(--text-3); font-size:14px;
-  pointer-events:none;
-}
-
-/* Filter pills */
-.filter-pills {
-  display:flex; gap:6px; flex-shrink:0;
-  overflow-x:auto; scrollbar-width:none;
-}
-.filter-pills::-webkit-scrollbar { display:none; }
-
-.filter-pill {
-  font-family:'Cinzel',serif; font-size:9px;
-  font-weight:600; letter-spacing:1.5px;
-  text-transform:uppercase; padding:5px 12px;
-  border-radius:20px; border:1px solid;
-  cursor:pointer; white-space:nowrap;
-  transition:all .2s; flex-shrink:0;
-  color:var(--text-3); border-color:rgba(255,255,255,.08);
-  background:transparent;
-}
-.filter-pill:hover { color:var(--text-2); border-color:rgba(255,255,255,.15); }
-.filter-pill.active {
-  color:var(--jungle-1); border-color:transparent;
-  background:var(--water);
-  box-shadow:0 0 12px rgba(78,205,196,.4);
-}
-
-/* Nav right */
-.nav-right {
-  display:flex; align-items:center;
-  gap:12px; margin-left:auto; flex-shrink:0;
-}
-
-.nav-tab {
-  font-family:'Cinzel',serif; font-size:9px;
-  font-weight:600; letter-spacing:2px;
-  text-transform:uppercase; padding:6px 14px;
-  border-radius:2px; text-decoration:none;
-  color:var(--text-3); border:1px solid transparent;
-  transition:all .2s; cursor:pointer; border:none;
-  background:transparent;
-}
-.nav-tab:hover { color:var(--text-2); }
-.nav-tab.active {
-  color:var(--water); border:1px solid rgba(78,205,196,.2);
-  background:rgba(78,205,196,.06);
-}
-
-.nav-avatar {
-  width:34px; height:34px; border-radius:50%;
-  background:linear-gradient(135deg,var(--water-2),var(--jungle-2));
-  border:1.5px solid rgba(78,205,196,.3);
-  display:flex; align-items:center; justify-content:center;
-  font-size:14px; cursor:pointer; overflow:hidden;
-  box-shadow:0 0 10px rgba(78,205,196,.15);
-  flex-shrink:0; position:relative;
-}
-
-/* Live counter pill */
-.live-pill {
-  display:flex; align-items:center; gap:6px;
-  background:rgba(10,48,24,.8); border:1px solid rgba(78,205,196,.2);
-  border-radius:20px; padding:4px 12px;
-  font-family:'Rajdhani',sans-serif; font-size:11px;
-  letter-spacing:2px; text-transform:uppercase;
-  color:var(--water); white-space:nowrap;
-}
-.live-dot {
-  width:6px; height:6px; border-radius:50%;
-  background:var(--water);
-  box-shadow:0 0 6px var(--water);
-  animation:dot-pulse 2s ease-in-out infinite;
-}
-@keyframes dot-pulse {
-  0%,100%{opacity:1;transform:scale(1)}
-  50%{opacity:.5;transform:scale(.8)}
-}
-
-/* ── MAP CONTAINER ── */
-.map-wrapper {
-  flex:1; position:relative; overflow:hidden;
-}
-
-#map {
-  width:100%; height:100%;
-}
-
-/* Leaflet overrides — dark oasis feel */
-.leaflet-container {
-  background:#041008 !important;
-  font-family:'Rajdhani',sans-serif !important;
-}
-
-.leaflet-tile-pane { filter: saturate(0.4) brightness(0.5) hue-rotate(140deg); }
-
-.leaflet-control-zoom {
-  border:1px solid var(--border) !important;
-  border-radius:2px !important;
-  box-shadow:none !important;
-}
-.leaflet-control-zoom a {
-  background:rgba(4,16,8,.9) !important;
-  color:var(--text-2) !important;
-  border-color:var(--border) !important;
-  font-size:16px !important; line-height:26px !important;
-}
-.leaflet-control-zoom a:hover {
-  background:rgba(10,48,24,.95) !important;
-  color:var(--water) !important;
-}
-
-.leaflet-control-attribution {
-  background:rgba(4,16,8,.7) !important;
-  color:var(--text-3) !important; font-size:9px !important;
-}
-.leaflet-control-attribution a { color:var(--text-3) !important; }
-
-/* ── CUSTOM DOME MARKERS ── */
-.dome-marker {
-  position:relative;
-  cursor:pointer;
-}
-
-.dome-marker-inner {
-  border-radius:50% 50% 0 0;
-  position:relative;
-  transition:transform .2s ease;
-}
-
-.dome-marker-inner::after {
-  content:'';
-  position:absolute; bottom:0;
-  left:10%; right:10%; height:3px;
-  border-radius:2px;
-}
-
-.dome-marker:hover .dome-marker-inner {
-  transform:translateY(-3px) scale(1.15);
-}
-
-/* Ripple on dome */
-.dome-ripple {
-  position:absolute; top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  border:1px solid;
-  animation:dome-ripple-anim 2.5s ease-out infinite;
-  pointer-events:none;
-}
-
-@keyframes dome-ripple-anim {
-  0%{transform:translate(-50%,-50%) scale(.5);opacity:.6}
-  100%{transform:translate(-50%,-50%) scale(2.5);opacity:0}
-}
-
-/* ── VIEW TOGGLE ── */
-.view-toggle {
-  position:absolute; bottom:20px; left:50%;
-  transform:translateX(-50%);
-  z-index:400;
-  display:flex; gap:4px;
-  background:rgba(4,16,8,.9);
-  border:1px solid var(--border);
-  border-radius:2px; padding:4px;
-  box-shadow:0 4px 20px rgba(0,0,0,.4);
-}
-
-.view-btn {
-  font-family:'Cinzel',serif; font-size:9px;
-  font-weight:600; letter-spacing:2px;
-  text-transform:uppercase; padding:8px 18px;
-  border-radius:1px; border:none; cursor:pointer;
-  transition:all .2s; background:transparent;
-  color:var(--text-3);
-}
-.view-btn.active {
-  background:var(--water); color:var(--jungle-1);
-  box-shadow:0 0 10px rgba(78,205,196,.3);
-}
-
-/* ── LIST VIEW ── */
-.list-view {
-  position:absolute; inset:0; z-index:300;
-  background:rgba(4,16,8,.97);
-  overflow-y:auto; display:none;
-  padding:20px;
-}
-.list-view.active { display:block; }
-
-.list-header {
-  font-family:'Cinzel',serif; font-size:14px;
-  letter-spacing:3px; color:var(--text-2);
-  margin-bottom:16px; text-transform:uppercase;
-}
-
-.list-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:12px;
-}
-
-.list-card {
-  background:rgba(10,48,24,.6);
-  border:1px solid var(--border);
-  border-radius:2px; padding:18px;
-  cursor:pointer; transition:all .2s;
-  position:relative; overflow:hidden;
-}
-.list-card::before {
-  content:''; position:absolute;
-  top:0; left:0; width:3px; height:100%;
-}
-.list-card:hover {
-  border-color:rgba(78,205,196,.3);
-  transform:translateY(-2px);
-  box-shadow:0 4px 16px rgba(0,0,0,.3);
-}
-
-.list-card-top {
-  display:flex; align-items:center;
-  gap:10px; margin-bottom:10px;
-}
-
-.list-avatar {
-  width:38px; height:38px; border-radius:50%;
-  border:1.5px solid rgba(78,205,196,.3);
-  display:flex; align-items:center;
-  justify-content:center; font-size:16px;
-  flex-shrink:0; overflow:hidden;
-}
-
-.list-name {
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px; font-weight:600; color:var(--text-1);
-}
-.list-location {
-  font-size:11px; color:var(--text-3);
-  letter-spacing:1px;
-}
-
-.list-impact {
-  font-size:9px; font-weight:600;
-  letter-spacing:2px; text-transform:uppercase;
-  padding:2px 8px; border-radius:20px;
-  border:1px solid; display:inline-block;
-  margin-bottom:8px;
-}
-
-.list-building {
-  font-size:13px; color:var(--text-2);
-  line-height:1.5;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-
-/* ── PROFILE CARD POPUP ── */
-.profile-popup {
-  position:absolute; bottom:0; left:0; right:0;
-  z-index:600; transform:translateY(100%);
-  transition:transform .4s cubic-bezier(.32,.72,0,1);
-}
-.profile-popup.open { transform:translateY(0); }
-
-.popup-map-peek {
-  height:80px;
-  background:linear-gradient(180deg,transparent 0%,rgba(4,16,8,.95) 100%);
-  pointer-events:none;
-}
-
-.popup-panel {
-  background:var(--card-bg);
-  border-top:2px solid var(--water);
-  padding:20px 20px 32px;
-  backdrop-filter:blur(16px);
-  max-height:70vh; overflow-y:auto;
-}
-
-.popup-handle {
-  width:36px; height:3px; background:rgba(255,255,255,.12);
-  border-radius:2px; margin:0 auto 20px;
-}
-
-.popup-close {
-  position:absolute; top:88px; right:16px;
-  width:32px; height:32px; border-radius:50%;
-  background:rgba(255,255,255,.08); border:none;
-  color:var(--text-3); font-size:16px;
-  cursor:pointer; display:flex;
-  align-items:center; justify-content:center;
-  transition:all .2s;
-}
-.popup-close:hover { background:rgba(255,255,255,.14); color:var(--text-1); }
-
-.popup-header {
-  display:flex; align-items:flex-start;
-  gap:14px; margin-bottom:16px;
-}
-
-.popup-avatar {
-  width:56px; height:56px; border-radius:50%;
-  border:2px solid rgba(78,205,196,.3);
-  display:flex; align-items:center;
-  justify-content:center; font-size:22px;
-  flex-shrink:0; overflow:hidden;
-  box-shadow:0 0 16px rgba(78,205,196,.2);
-}
-
-.popup-name {
-  font-family:'Cormorant Garamond',serif;
-  font-size:22px; font-weight:600;
-  color:var(--text-1); margin-bottom:3px;
-}
-
-.popup-location {
-  font-family:'Rajdhani',sans-serif;
-  font-size:11px; letter-spacing:2px;
-  color:var(--text-3); text-transform:uppercase;
-  margin-bottom:6px;
-}
-
-.popup-impact-tag {
-  font-size:9px; font-weight:600;
-  letter-spacing:2px; text-transform:uppercase;
-  padding:3px 10px; border-radius:20px;
-  border:1px solid; display:inline-block;
-}
-
-.popup-field { margin-bottom:14px; }
-
-.popup-field-label {
-  font-family:'Rajdhani',sans-serif; font-size:9px;
-  font-weight:700; letter-spacing:3px;
-  text-transform:uppercase; color:var(--gold);
-  margin-bottom:4px;
-}
-
-.popup-field-value {
-  font-family:'Rajdhani',sans-serif; font-size:15px;
-  color:var(--text-2); line-height:1.6;
-}
-
-.popup-link {
-  display:inline-flex; align-items:center; gap:6px;
-  font-family:'Cinzel',serif; font-size:10px;
-  letter-spacing:2px; text-transform:uppercase;
-  color:var(--water); text-decoration:none;
-  padding:6px 12px; border:1px solid rgba(78,205,196,.25);
-  border-radius:2px; margin-top:4px;
-  transition:all .2s;
-}
-.popup-link:hover {
-  background:rgba(78,205,196,.08);
-  border-color:rgba(78,205,196,.5);
-}
-
-.popup-actions {
-  display:flex; gap:10px; margin-top:20px;
-}
-
-.btn-collab {
-  flex:1; font-family:'Cinzel',serif;
-  font-size:11px; font-weight:700;
-  letter-spacing:4px; text-transform:uppercase;
-  color:var(--jungle-1); background:linear-gradient(135deg,var(--water),var(--water-2));
-  border:none; border-radius:2px; padding:15px;
-  cursor:pointer; display:flex; align-items:center;
-  justify-content:center; gap:8px;
-  box-shadow:0 4px 20px rgba(78,205,196,.3);
-  transition:transform .2s, box-shadow .2s;
-}
-.btn-collab:hover {
-  transform:translateY(-2px);
-  box-shadow:0 6px 28px rgba(78,205,196,.5);
-}
-
-.btn-view-full {
-  font-family:'Cinzel',serif; font-size:10px;
-  font-weight:600; letter-spacing:3px;
-  text-transform:uppercase; color:var(--text-3);
-  background:transparent; border:1px solid rgba(255,255,255,.08);
-  border-radius:2px; padding:15px 20px;
-  cursor:pointer; transition:all .2s;
-}
-.btn-view-full:hover { color:var(--text-2); border-color:rgba(255,255,255,.15); }
-
-/* Already sent request state */
-.collab-sent {
-  flex:1; font-family:'Cinzel',serif; font-size:10px;
-  letter-spacing:3px; text-transform:uppercase;
-  color:var(--water); border:1px solid rgba(78,205,196,.25);
-  border-radius:2px; padding:15px;
-  text-align:center; pointer-events:none;
-}
-
-/* ── COLLAB REQUEST MODAL ── */
-.modal-overlay {
-  position:fixed; inset:0; z-index:800;
-  background:rgba(4,16,8,.8); backdrop-filter:blur(8px);
-  display:none; align-items:flex-end; justify-content:center;
-  padding:0 0 20px;
-}
-.modal-overlay.active { display:flex; }
-
-.modal {
-  width:100%; max-width:640px;
-  background:rgba(4,16,8,.98);
-  border:1px solid var(--border);
-  border-top:2px solid var(--water);
-  border-radius:2px; padding:28px;
-  animation:modal-up .3s ease;
-}
-@keyframes modal-up {
-  from{transform:translateY(40px);opacity:0}
-  to{transform:translateY(0);opacity:1}
-}
-
-.modal-title {
-  font-family:'Cinzel',serif; font-size:16px;
-  font-weight:700; letter-spacing:3px;
-  color:var(--text-1); margin-bottom:4px;
-}
-.modal-sub {
-  font-family:'Cormorant Garamond',serif;
-  font-size:14px; font-style:italic;
-  color:var(--text-3); margin-bottom:20px;
-}
-
-.modal-receiver {
-  display:flex; align-items:center; gap:10px;
-  background:rgba(10,48,24,.5); border:1px solid var(--border);
-  border-radius:2px; padding:12px 14px; margin-bottom:20px;
-}
-.modal-receiver-avatar {
-  width:32px; height:32px; border-radius:50%;
-  border:1px solid rgba(78,205,196,.3);
-  display:flex; align-items:center;
-  justify-content:center; font-size:14px; overflow:hidden;
-}
-.modal-receiver-name {
-  font-family:'Cinzel',serif; font-size:13px;
-  color:var(--text-1); letter-spacing:1px;
-}
-.modal-receiver-project {
-  font-size:12px; color:var(--text-3);
-  font-style:italic;
-}
-
-.modal-prompt {
-  font-family:'Rajdhani',sans-serif; font-size:11px;
-  font-weight:600; letter-spacing:3px; text-transform:uppercase;
-  color:var(--water); margin-bottom:8px;
-}
-
-.modal-textarea {
-  width:100%; background:rgba(10,48,24,.7);
-  border:1px solid var(--border); border-radius:2px;
-  padding:14px; font-family:'Rajdhani',sans-serif;
-  font-size:15px; color:var(--text-1);
-  line-height:1.65; resize:vertical; min-height:120px;
-  outline:none; transition:border-color .2s;
-}
-.modal-textarea::placeholder { color:var(--text-3); }
-.modal-textarea:focus {
-  border-color:rgba(78,205,196,.4);
-  background:rgba(10,48,24,.9);
-}
-
-.modal-counter {
-  text-align:right; font-size:11px; letter-spacing:1px;
-  color:var(--text-3); margin-top:6px; margin-bottom:20px;
-}
-.modal-counter.over { color:#E05A5A; }
-
-.modal-actions { display:flex; gap:10px; }
-
-.btn-send {
-  flex:1; font-family:'Cinzel',serif;
-  font-size:11px; font-weight:700;
-  letter-spacing:4px; text-transform:uppercase;
-  color:var(--jungle-1);
-  background:linear-gradient(135deg,var(--water),var(--water-2));
-  border:none; border-radius:2px; padding:15px;
-  cursor:pointer; transition:all .2s;
-}
-.btn-send:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(78,205,196,.4); }
-.btn-send:disabled { opacity:.4; cursor:not-allowed; transform:none; }
-
-.btn-cancel {
-  font-family:'Cinzel',serif; font-size:10px;
-  font-weight:600; letter-spacing:3px;
-  text-transform:uppercase; color:var(--text-3);
-  background:transparent; border:1px solid rgba(255,255,255,.08);
-  border-radius:2px; padding:15px 20px; cursor:pointer;
-  transition:all .2s;
-}
-.btn-cancel:hover { color:var(--text-2); border-color:rgba(255,255,255,.15); }
-
-/* ── SUCCESS TOAST ── */
-.toast {
-  position:fixed; top:70px; left:50%;
-  transform:translateX(-50%) translateY(-20px);
-  z-index:900; background:rgba(10,48,24,.95);
-  border:1px solid rgba(78,205,196,.3);
-  border-radius:2px; padding:12px 24px;
-  font-family:'Cinzel',serif; font-size:11px;
-  letter-spacing:3px; text-transform:uppercase;
-  color:var(--water); opacity:0;
-  transition:all .3s ease; white-space:nowrap;
-  box-shadow:0 4px 20px rgba(0,0,0,.4);
-}
-.toast.show {
-  opacity:1; transform:translateX(-50%) translateY(0);
-}
-
-/* ── LOADING ── */
-.map-loading {
-  position:absolute; inset:0; z-index:200;
-  background:var(--jungle-1);
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:16px;
-}
-.map-loading.hidden { display:none; }
-
-.loading-spinner {
-  width:44px; height:44px; border-radius:50%;
-  border:2px solid rgba(78,205,196,.12);
-  border-top-color:var(--water);
-  animation:spin 1s linear infinite;
-}
-@keyframes spin { to{transform:rotate(360deg)} }
-
-.loading-text {
-  font-family:'Cinzel',serif; font-size:11px;
-  letter-spacing:4px; text-transform:uppercase;
-  color:var(--text-2); opacity:.7;
-}
-
-/* ── EMPTY STATE ── */
-.empty-map {
-  position:absolute; top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  text-align:center; z-index:100;
-  pointer-events:none;
-}
-.empty-map-text {
-  font-family:'Cormorant Garamond',serif;
-  font-size:20px; font-style:italic;
-  color:var(--text-3); line-height:1.6;
-}
-
-/* ── BOTTOM NAV ── */
-.bottom-nav {
-  position:relative; z-index:500;
-  background:rgba(4,16,8,.97);
-  border-top:1px solid var(--border);
-  display:flex; justify-content:space-around;
-  padding:8px 0 12px; flex-shrink:0;
-}
-
-.bottom-tab {
-  display:flex; flex-direction:column;
-  align-items:center; gap:4px; padding:4px 16px;
-  text-decoration:none; cursor:pointer;
-  border:none; background:transparent;
-  transition:all .2s;
-}
-
-.bottom-tab-icon { font-size:20px; line-height:1; }
-
-.bottom-tab-label {
-  font-family:'Cinzel',serif; font-size:8px;
-  letter-spacing:1.5px; text-transform:uppercase;
-  color:var(--text-3); transition:color .2s;
-}
-
-.bottom-tab.active .bottom-tab-label { color:var(--water); }
-.bottom-tab.active .bottom-tab-icon { filter:drop-shadow(0 0 6px var(--water)); }
-
-/* ── IMPACT COLOR MAP ── */
-.impact-Climate   { color:var(--c-climate); border-color:rgba(78,205,196,.4); }
-.impact-Health    { color:var(--c-health);  border-color:rgba(255,107,157,.4); }
-.impact-Education { color:var(--c-edu);     border-color:rgba(255,208,128,.4); }
-.impact-Technology{ color:var(--c-tech);    border-color:rgba(155,89,182,.4); }
-.impact-Infrastructure{ color:var(--c-infra); border-color:rgba(230,126,34,.4); }
-.impact-Food      { color:var(--c-food);    border-color:rgba(39,174,96,.4); }
-.impact-Water     { color:var(--c-water);   border-color:rgba(52,152,219,.4); }
-.impact-Energy    { color:var(--c-energy);  border-color:rgba(241,196,15,.4); }
-.impact-Other     { color:var(--c-other);   border-color:rgba(149,165,166,.4); }
-
-@media(max-width:640px){
-  .filter-pills { display:none; }
-  .nav-logo { font-size:14px; letter-spacing:4px; }
-  .search-wrap { max-width:none; }
-  .list-grid { grid-template-columns:1fr; }
-}
-
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important;}
-}
-
+  --jungle-1:#041008;--water:#4ECDC4;--water-2:#2A8A7A;
+  --amber:#D4820A;--gold:#C4944A;--gold-2:#FFD080;--cream:#F0E0C0;
+  --text-1:#F0E8D0;--text-2:rgba(240,232,208,.65);--text-3:rgba(240,232,208,.35);
+  --border:rgba(78,205,196,.12);--card-bg:rgba(6,26,14,.9);
+  --progress:#4ECDC4;--breakthrough:#FFD080;--failure:#E07A5F;--collab-c:#C4944A;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--jungle-1);}
+body{font-family:'Rajdhani',sans-serif;min-height:100vh;background:linear-gradient(180deg,#0A1828 0%,#0A3018 40%,#041008 100%);cursor:none;display:flex;flex-direction:column;}
+.cursor{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--water);box-shadow:0 0 10px rgba(78,205,196,.6);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;}
+.cursor-ring{position:fixed;width:26px;height:26px;border-radius:50%;border:1px solid rgba(78,205,196,.3);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+.top-nav{position:sticky;top:0;z-index:500;background:rgba(4,16,8,.97);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:56px;gap:16px;}
+.nav-logo{font-family:'Cinzel',serif;font-size:18px;font-weight:900;letter-spacing:6px;background:linear-gradient(135deg,var(--cream),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-title{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--text-2);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--water-2),#0A3018);border:1.5px solid rgba(78,205,196,.3);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;overflow:hidden;}
+
+.main{flex:1;max-width:680px;margin:0 auto;width:100%;padding:20px 16px 100px;}
+.post-card{background:var(--card-bg);border:1px solid var(--border);border-radius:2px;margin-bottom:16px;overflow:hidden;position:relative;}
+.post-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+.post-card.progress::before{background:var(--progress);}
+.post-card.breakthrough::before{background:var(--breakthrough);}
+.post-card.failure::before{background:var(--failure);}
+.post-card.collab_ann::before{background:var(--collab-c);}
+.post-inner{padding:18px 18px 14px 22px;}
+.post-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.post-avatar{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(78,205,196,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;background:rgba(10,48,24,.8);}
+.post-meta{flex:1;min-width:0;}
+.post-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
+.post-info{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.post-project{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--gold);font-weight:600;letter-spacing:1px;}
+.post-time{font-size:11px;color:var(--text-3);}
+.post-type-tag{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid;display:inline-block;flex-shrink:0;}
+.tag-p{color:var(--progress);border-color:rgba(78,205,196,.3);background:rgba(78,205,196,.06);}
+.tag-b{color:var(--breakthrough);border-color:rgba(255,208,128,.3);background:rgba(255,208,128,.06);}
+.tag-f{color:var(--failure);border-color:rgba(224,122,95,.3);background:rgba(224,122,95,.06);}
+.tag-c{color:var(--collab-c);border-color:rgba(196,148,74,.3);background:rgba(196,148,74,.06);}
+.post-body{font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+.post-actions{display:flex;border-top:1px solid rgba(78,205,196,.06);padding-top:10px;}
+.post-action{display:flex;align-items:center;gap:6px;font-family:'Cinzel',serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);border:none;background:transparent;cursor:pointer;padding:4px 14px 4px 0;transition:color .2s;}
+.post-action:hover{color:var(--water);}
+.collab-banner{background:linear-gradient(135deg,rgba(196,148,74,.08),rgba(78,205,196,.05));border-top:1px solid rgba(196,148,74,.1);padding:12px 22px;display:flex;align-items:center;gap:12px;}
+.collab-avatars{display:flex;}
+.collab-av{width:30px;height:30px;border-radius:50%;border:2px solid rgba(196,148,74,.3);background:rgba(10,48,24,.8);display:flex;align-items:center;justify-content:center;font-size:13px;}
+.collab-av:last-child{margin-left:-8px;}
+.collab-text{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--gold);}
+.compose-btn{position:fixed;bottom:80px;right:20px;z-index:400;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--water),var(--water-2));border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(78,205,196,.4);transition:transform .2s;}
+.compose-btn:hover{transform:scale(1.1);}
+.modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(4,16,8,.85);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{width:100%;max-width:680px;background:rgba(4,16,8,.98);border:1px solid var(--border);border-top:2px solid var(--water);border-radius:2px 2px 0 0;padding:24px;animation:mu .3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes mu{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--text-1);margin-bottom:4px;}
+.modal-sub{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--text-3);margin-bottom:20px;}
+.modal-field{margin-bottom:16px;}
+.modal-label{display:block;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text-2);margin-bottom:6px;}
+.modal-input{width:100%;background:rgba(10,48,24,.7);border:1px solid var(--border);border-radius:2px;padding:11px 13px;font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--text-1);outline:none;transition:border-color .2s;}
+.modal-input::placeholder{color:var(--text-3);}
+.modal-input:focus{border-color:rgba(78,205,196,.4);}
+textarea.modal-input{resize:vertical;min-height:100px;line-height:1.65;}
+.type-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.type-opt{padding:12px;border-radius:2px;border:1px solid var(--border);cursor:pointer;transition:all .2s;text-align:center;background:rgba(10,48,24,.4);}
+.type-opt.selected{border-color:var(--water);background:rgba(78,205,196,.08);}
+.type-opt-icon{font-size:20px;margin-bottom:4px;}
+.type-opt-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-2);display:block;}
+.type-opt.selected .type-opt-lbl{color:var(--water);}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+.btn-post{flex:1;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#04100A;background:linear-gradient(135deg,var(--water),var(--water-2));border:none;border-radius:2px;padding:15px;cursor:pointer;transition:all .2s;}
+.btn-post:disabled{opacity:.4;cursor:not-allowed;}
+.btn-cancel{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--text-3);background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:2px;padding:15px 20px;cursor:pointer;}
+.empty-state{text-align:center;padding:60px 24px;}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--text-2);margin-bottom:8px;}
+.empty-sub{font-size:14px;color:var(--text-3);}
+.toast{position:fixed;top:66px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:900;background:rgba(10,48,24,.95);border:1px solid rgba(78,205,196,.3);border-radius:2px;padding:10px 22px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--water);opacity:0;transition:all .3s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(4,16,8,.97);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 12px;}
+.bottom-tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 16px;cursor:pointer;border:none;background:transparent;}
+.bottom-tab-icon{font-size:20px;line-height:1;}
+.bottom-tab-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);}
+.bottom-tab.active .bottom-tab-label{color:var(--water);}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
 <body>
-
 <div class="cursor" id="C"></div>
 <div class="cursor-ring" id="CR"></div>
-
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- TOP NAV -->
 <nav class="top-nav">
   <div class="nav-logo">AETHERIA</div>
-
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input class="search-input" type="text" id="searchInput"
-      placeholder="Search builders by skill, project, or location...">
-  </div>
-
-  <div class="filter-pills" id="filterPills">
-    <button class="filter-pill active" data-filter="all">All</button>
-    <button class="filter-pill" data-filter="Climate">🌍 Climate</button>
-    <button class="filter-pill" data-filter="Health">🏥 Health</button>
-    <button class="filter-pill" data-filter="Education">📚 Education</button>
-    <button class="filter-pill" data-filter="Technology">⚡ Tech</button>
-    <button class="filter-pill" data-filter="Infrastructure">🏗️ Infra</button>
-    <button class="filter-pill" data-filter="Food">🌱 Food</button>
-    <button class="filter-pill" data-filter="Water">💧 Water</button>
-    <button class="filter-pill" data-filter="Energy">🔋 Energy</button>
-  </div>
-
+  <div class="nav-title">The Feed</div>
   <div class="nav-right">
-    <div class="live-pill">
-      <div class="live-dot"></div>
-      <span id="liveCount">0</span> builders
-    </div>
-    <div class="nav-avatar" id="navAvatar" onclick="window.location.href='/Aetheria/profile.html'">
-      🌍
-    </div>
+    <div class="nav-avatar" id="navAvatar">🌍</div>
   </div>
 </nav>
 
-<!-- MAP WRAPPER -->
-<div class="map-wrapper">
 
-  <!-- Loading state -->
-  <div class="map-loading" id="mapLoading">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Loading the world...</div>
-  </div>
 
-  <!-- The map -->
-  <div id="map"></div>
-
-  <!-- List view overlay -->
-  <div class="list-view" id="listView">
-    <div class="list-header" id="listHeader">All Builders</div>
-    <div class="list-grid" id="listGrid"></div>
-  </div>
-
-  <!-- View toggle -->
-  <div class="view-toggle">
-    <button class="view-btn active" id="mapViewBtn" onclick="switchView('map')">🗺 Map</button>
-    <button class="view-btn" id="listViewBtn" onclick="switchView('list')">☰ List</button>
-  </div>
-
-  <!-- Profile popup -->
-  <div class="profile-popup" id="profilePopup">
-    <div class="popup-map-peek"></div>
-    <div class="popup-panel">
-      <div class="popup-handle"></div>
-      <button class="popup-close" onclick="closePopup()">✕</button>
-
-      <div class="popup-header">
-        <div class="popup-avatar" id="popupAvatar">🌍</div>
-        <div>
-          <div class="popup-name" id="popupName">Builder Name</div>
-          <div class="popup-location" id="popupLocation">📍 City, Country</div>
-          <div class="popup-impact-tag" id="popupImpact">Impact</div>
-        </div>
-      </div>
-
-      <div class="popup-field">
-        <div class="popup-field-label">What I'm Building</div>
-        <div class="popup-field-value" id="popupBuilding">—</div>
-      </div>
-
-      <div class="popup-field">
-        <div class="popup-field-label">What I Bring</div>
-        <div class="popup-field-value" id="popupSkills">—</div>
-      </div>
-
-      <div class="popup-field">
-        <a class="popup-link" id="popupWorkLink" href="#" target="_blank" rel="noopener">
-          ↗ View Their Work
-        </a>
-      </div>
-
-      <div class="popup-actions" id="popupActions">
-        <button class="btn-collab" id="collabBtn" onclick="openCollabModal()">
-          ⚡ Collab
-        </button>
-        <button class="btn-view-full" onclick="viewFullProfile()">
-          Full Profile
-        </button>
-      </div>
-    </div>
-  </div>
-
+<div class="main">
+  <div id="feedPosts"></div>
 </div>
 
-<!-- COLLAB REQUEST MODAL -->
-<div class="modal-overlay" id="collabModal">
+<button class="compose-btn" onclick="openCompose()" title="Share your build">✦</button>
+
+<div class="modal-overlay" id="composeModal">
   <div class="modal">
-    <div class="modal-title">Send a Collab Request</div>
-    <div class="modal-sub">Tell them what you need and why they're the right fit.</div>
-
-    <div class="modal-receiver">
-      <div class="modal-receiver-avatar" id="modalReceiverAvatar">🌍</div>
-      <div>
-        <div class="modal-receiver-name" id="modalReceiverName">Builder Name</div>
-        <div class="modal-receiver-project" id="modalReceiverProject">Their project</div>
+    <div class="modal-title">Share Your Build</div>
+    <div class="modal-sub">Proof of work only. What did you actually do?</div>
+    <div class="modal-field">
+      <div class="modal-label">Post Type</div>
+      <div class="type-selector">
+        <div class="type-opt selected" data-type="progress_update" onclick="selectType(this)"><div class="type-opt-icon">⚡</div><span class="type-opt-lbl">Progress</span></div>
+        <div class="type-opt" data-type="breakthrough" onclick="selectType(this)"><div class="type-opt-icon">💡</div><span class="type-opt-lbl">Breakthrough</span></div>
+        <div class="type-opt" data-type="lessons_from_failure" onclick="selectType(this)"><div class="type-opt-icon">🔥</div><span class="type-opt-lbl">Lessons</span></div>
+        <div class="type-opt" data-type="collab_announcement" onclick="selectType(this)"><div class="type-opt-icon">🤝</div><span class="type-opt-lbl">Collab</span></div>
       </div>
     </div>
-
-    <div class="modal-prompt">What do you need help with and why is this person the right fit?</div>
-    <textarea class="modal-textarea" id="collabMessage"
-      placeholder="Be specific. What exactly do you need? Why them?"></textarea>
-    <div class="modal-counter" id="collabCounter">0 / 150 words</div>
-
+    <div class="modal-field">
+      <label class="modal-label" for="postProject">Which project? *</label>
+      <input class="modal-input" type="text" id="postProject" placeholder="Name your project">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label" for="postContent">What happened? *</label>
+      <textarea class="modal-input" id="postContent" rows="5" placeholder="Share what you built, learned, or accomplished."></textarea>
+    </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeCollabModal()">Cancel</button>
-      <button class="btn-send" id="sendCollabBtn" onclick="sendCollabRequest()">
-        ⚡ Send Request
-      </button>
+      <button class="btn-cancel" onclick="closeCompose()">Cancel</button>
+      <button class="btn-post" id="postBtn" onclick="submitPost()">✦ Post</button>
     </div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="bottom-tab active" onclick="window.location.href='/Aetheria/dashboard.html'">
-    <div class="bottom-tab-icon">🌍</div>
-    <div class="bottom-tab-label">Aetheria</div>
-  </button>
-  <button class="bottom-tab" onclick="window.location.href='/Aetheria/feed.html'">
-    <div class="bottom-tab-icon">✦</div>
-    <div class="bottom-tab-label">Feed</div>
-  </button>
-  <button class="bottom-tab" onclick="window.location.href='/Aetheria/scribe.html'">
-    <div class="bottom-tab-icon">📜</div>
-    <div class="bottom-tab-label">Scribe</div>
-  </button>
-  <button class="bottom-tab" onclick="window.location.href='/Aetheria/collab.html'">
-    <div class="bottom-tab-icon">💬</div>
-    <div class="bottom-tab-label">Collabs</div>
-  </button>
-  <button class="bottom-tab" onclick="window.location.href='/Aetheria/profile.html'">
-    <div class="bottom-tab-icon">◎</div>
-    <div class="bottom-tab-label">Profile</div>
-  </button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/dashboard.html'"><div class="bottom-tab-icon">🌍</div><div class="bottom-tab-label">Aetheria</div></button>
+  <button class="bottom-tab active"><div class="bottom-tab-icon">✦</div><div class="bottom-tab-label">Feed</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/scribe.html'"><div class="bottom-tab-icon">📜</div><div class="bottom-tab-label">Scribe</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/collabs.html'"><div class="bottom-tab-icon">💬</div><div class="bottom-tab-label">Collabs</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/profile.html'"><div class="bottom-tab-icon">◎</div><div class="bottom-tab-label">Profile</div></button>
 </nav>
 
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+<script>
+// ── NO MODULE — avoids scope issues entirely ──
 
 const SUPABASE_URL = 'https://fenilyhufciuonhldpxo.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlbmlseWh1ZmNpdW9uaGxkcHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzgwNzQsImV4cCI6MjA5NDQxNDA3NH0.8_NWxnOMhOyhCXSTbdmQ7bR562cH6b74Vz4DO_73CYI'
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlbmlseWh1ZmNpdW9uaGxkcHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzgwNzQsImV4cCI6MjA5NDQxNDA3NH0.8_NWxnOMhOyhCXSTbdmQ7bR562cH6b74Vz4DO_73CYI'
 
-// ── CURSOR ──
+// Cursor
 const C=document.getElementById('C'),CR=document.getElementById('CR')
 let mx=0,my=0,rx=0,ry=0
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px'})
 ;(function aR(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(aR)})()
 
-// ── STATE ──
-let map = null
-let allBuilders = []
-let filteredBuilders = []
-let markers = {}
+// State
+let selectedPostType = 'progress_update'
 let currentUser = null
-let currentProfile = null
-let selectedBuilder = null
-let currentView = 'map'
-let activeFilter = 'all'
-let sentRequests = new Set()
 
-// Impact area colors
-const IMPACT_COLORS = {
-  Climate:        '#4ECDC4',
-  Health:         '#FF6B9D',
-  Education:      '#FFD080',
-  Technology:     '#9B59B6',
-  Infrastructure: '#E67E22',
-  Food:           '#27AE60',
-  Water:          '#3498DB',
-  Energy:         '#F1C40F',
-  Other:          '#95A5A6'
+// Mock posts — show immediately, replaced by real data if available
+const MOCK = [
+  {id:'m1',post_type:'breakthrough',project_name:'Plastic to Fuel Converter',content:'After 8 months of testing we finally hit 94% conversion efficiency on mixed plastic waste. One ton of plastic now produces roughly 850 liters of usable fuel. The implications for coastal communities without waste infrastructure are massive. We are ready to scale.',created_at:new Date(Date.now()-3600000).toISOString(),users:{name:'Julian B.',profile_photo:null,location_city:'Atlanta',location_country:'USA'}},
+  {id:'m2',post_type:'progress_update',project_name:'Atmospheric Water Generator',content:'Deployed unit #47 in Navajo Nation. Producing 300 gallons per day from air humidity alone. Zero infrastructure required. The community has not had reliable clean water access in over a decade. This is why we build.',created_at:new Date(Date.now()-7200000).toISOString(),users:{name:'Moses W.',profile_photo:null,location_city:'Houston',location_country:'USA'}},
+  {id:'m3',post_type:'lessons_from_failure',project_name:'Soil Regeneration System',content:'Lost 3 months building the wrong thing. We assumed farmers needed a complex IoT sensor network. They needed a simple soil test they could read themselves. Talk to the people you are building for before you build anything. Starting over. No regrets.',created_at:new Date(Date.now()-86400000).toISOString(),users:{name:'Amara K.',profile_photo:null,location_city:'Nairobi',location_country:'Kenya'}},
+  {id:'m4',post_type:'collab_announcement',project_name:'Off-Grid Energy Network',content:'Just connected with a structural engineer who has been solving the same problem from a different angle for 2 years. We found each other on Aetheria last week. Already have a working prototype of something neither of us could have built alone.',created_at:new Date(Date.now()-172800000).toISOString(),users:{name:'Dayo O.',profile_photo:null,location_city:'Lagos',location_country:'Nigeria'}},
+  {id:'m5',post_type:'progress_update',project_name:'Community Health Infrastructure',content:'Trained 40 community health workers in rural Guatemala this week. Each one now serves 200 people. No clinic. No hospital. Just knowledge and a solar-powered diagnostic kit. Healthcare does not have to look the way we were taught it does.',created_at:new Date(Date.now()-259200000).toISOString(),users:{name:'Dr. Sofia M.',profile_photo:null,location_city:'Guatemala City',location_country:'Guatemala'}}
+]
+
+const TYPE = {
+  progress_update:{label:'Progress',cls:'progress',tag:'tag-p'},
+  breakthrough:{label:'Breakthrough',cls:'breakthrough',tag:'tag-b'},
+  lessons_from_failure:{label:'Lessons',cls:'failure',tag:'tag-f'},
+  collab_announcement:{label:'Collab',cls:'collab_ann',tag:'tag-c'}
 }
 
-// ── AUTH CHECK ──
-;(async () => {
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) {
-    window.location.href = '/Aetheria/apply.html'
-    return
-  }
-  currentUser = session.user
-
-  // Get current user profile
-  const { data: profile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', currentUser.id)
-    .single()
-
-  if (!profile) {
-    window.location.href = '/Aetheria/apply.html'
-    return
-  }
-
-  if (!profile.profile_complete) {
-    window.location.href = '/Aetheria/profile.html'
-    return
-  }
-
-  if (profile.status !== 'active') {
-    window.location.href = '/Aetheria/pending.html'
-    return
-  }
-
-  currentProfile = profile
-
-  // Set nav avatar
-  const navAvatar = document.getElementById('navAvatar')
-  if (profile.profile_photo) {
-    navAvatar.innerHTML = `<img src="${profile.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-  }
-
-  // Load sent requests
-  await loadSentRequests()
-
-  // Init map
-  initMap()
-
-  // Load builders
-  await loadBuilders()
-})()
-
-// ── INIT MAP ──
-function initMap() {
-  map = L.map('map', {
-    center: [20, 0],
-    zoom: 2,
-    zoomControl: true,
-    attributionControl: true,
-    minZoom: 2,
-    maxZoom: 18
-  })
-
-  // Dark terrain tiles
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 19
-  }).addTo(map)
-
-  // Close popup on map click
-  map.on('click', () => closePopup())
+function timeAgo(d){
+  const m=Math.floor((Date.now()-new Date(d))/60000)
+  if(m<60)return m+'m ago'
+  const h=Math.floor(m/60)
+  if(h<24)return h+'h ago'
+  return Math.floor(h/24)+'d ago'
 }
 
-// ── LOAD SENT REQUESTS ──
-async function loadSentRequests() {
-  const { data } = await supabase
-    .from('collab_requests')
-    .select('receiver_id')
-    .eq('sender_id', currentUser.id)
-    .in('status', ['pending', 'accepted'])
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
 
-  if (data) {
-    data.forEach(r => sentRequests.add(r.receiver_id))
-  }
-}
-
-// ── LOAD BUILDERS ──
-async function loadBuilders() {
-  const { data, error } = await supabase
-    .from('users')
-    .select('id,name,location_city,location_country,location_lat,location_lng,impact_area,what_building,skills,work_link,profile_photo,created_at')
-    .eq('status', 'active')
-    .eq('profile_complete', true)
-    .not('location_lat', 'is', null)
-    .neq('id', currentUser.id)
-
-  if (error) {
-    console.error('Error loading builders:', error)
-    document.getElementById('mapLoading').classList.add('hidden')
-    return
-  }
-
-  allBuilders = data || []
-  filteredBuilders = [...allBuilders]
-
-  // Update live count
-  document.getElementById('liveCount').textContent = allBuilders.length
-
-  // Plot markers
-  plotMarkers(allBuilders)
-
-  // Render list
-  renderList(allBuilders)
-
-  // Hide loading
-  document.getElementById('mapLoading').classList.add('hidden')
-}
-
-// ── PLOT MARKERS ──
-function plotMarkers(builders) {
-  // Clear existing
-  Object.values(markers).forEach(m => map.removeLayer(m))
-  markers = {}
-
-  builders.forEach(builder => {
-    if (!builder.location_lat || !builder.location_lng) return
-
-    const color = IMPACT_COLORS[builder.impact_area] || '#4ECDC4'
-    const size = 28
-
-    // Custom dome icon
-    const icon = L.divIcon({
-      className: '',
-      iconSize: [size, size * 0.8],
-      iconAnchor: [size/2, size * 0.8],
-      html: `
-        <div class="dome-marker" style="width:${size}px;">
-          <div class="dome-ripple" style="width:${size}px;height:${size}px;border-color:${color};opacity:.4;"></div>
-          <div class="dome-marker-inner" style="
-            width:${size}px;
-            height:${size * 0.7}px;
-            background:linear-gradient(180deg,${color}CC 0%,${color}66 60%,${color}22 100%);
-            border-top:1.5px solid ${color};
-          ">
-            <div style="
-              position:absolute;bottom:0;left:10%;right:10%;
-              height:3px;border-radius:2px;
-              background:${color};
-              box-shadow:0 0 8px ${color};
-            "></div>
+function renderPost(p){
+  const u=p.users||{}
+  const av=u.profile_photo?`<img src="${u.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:'🌍'
+  const t=TYPE[p.post_type]||TYPE.progress_update
+  return `
+    <div class="post-card ${t.cls}">
+      <div class="post-inner">
+        <div class="post-header">
+          <div class="post-avatar">${av}</div>
+          <div class="post-meta">
+            <div class="post-name">${u.name||'Builder'}</div>
+            <div class="post-info">
+              <span class="post-project">▸ ${p.project_name}</span>
+              <span class="post-time">${timeAgo(p.created_at)}</span>
+            </div>
           </div>
+          <div class="post-type-tag ${t.tag}">${t.label}</div>
         </div>
-      `
-    })
-
-    const marker = L.marker([builder.location_lat, builder.location_lng], { icon })
-    marker.on('click', (e) => {
-      L.DomEvent.stopPropagation(e)
-      openBuilderPopup(builder)
-    })
-    marker.addTo(map)
-    markers[builder.id] = marker
-  })
-}
-
-// ── RENDER LIST ──
-function renderList(builders) {
-  const grid = document.getElementById('listGrid')
-  const header = document.getElementById('listHeader')
-
-  header.textContent = `${builders.length} Builder${builders.length !== 1 ? 's' : ''}`
-
-  if (builders.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 0;">
-      <p style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--text-3);">No builders found in this area yet.<br>Be the first.</p>
-    </div>`
-    return
-  }
-
-  grid.innerHTML = builders.map(b => {
-    const color = IMPACT_COLORS[b.impact_area] || '#4ECDC4'
-    const avatar = b.profile_photo
-      ? `<img src="${b.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-      : '🌍'
-    return `
-      <div class="list-card" onclick="openBuilderPopup(${JSON.stringify(b).replace(/"/g,'&quot;')})" style="--accent:${color};">
-        <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:${color};border-radius:2px 0 0 2px;"></div>
-        <div class="list-card-top">
-          <div class="list-avatar" style="background:${color}22;border-color:${color}44;">
-            ${avatar}
-          </div>
-          <div>
-            <div class="list-name">${b.name}</div>
-            <div class="list-location">📍 ${b.location_city}, ${b.location_country}</div>
-          </div>
+        <div class="post-body">${esc(p.content)}</div>
+        <div class="post-actions">
+          <button class="post-action">💬 Reply</button>
+          <button class="post-action">↗ Amplify</button>
+          <button class="post-action">◎ Profile</button>
         </div>
-        <div class="list-impact impact-${b.impact_area}">${b.impact_area || 'Other'}</div>
-        <div class="list-building">${b.what_building || '—'}</div>
       </div>
-    `
-  }).join('')
+      ${p.post_type==='collab_announcement'?`<div class="collab-banner"><div class="collab-avatars"><div class="collab-av">${av}</div><div class="collab-av">🌍</div></div><div class="collab-text">Two builders just connected. Something is being built.</div></div>`:''}
+    </div>`
 }
 
-// ── OPEN BUILDER POPUP ──
-window.openBuilderPopup = function(builder) {
-  if (typeof builder === 'string') {
-    try { builder = JSON.parse(builder) } catch(e) { return }
-  }
-
-  selectedBuilder = builder
-  const color = IMPACT_COLORS[builder.impact_area] || '#4ECDC4'
-
-  // Set avatar
-  const avatar = document.getElementById('popupAvatar')
-  avatar.innerHTML = builder.profile_photo
-    ? `<img src="${builder.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-    : '🌍'
-  avatar.style.borderColor = color + '66'
-  avatar.style.boxShadow = `0 0 16px ${color}33`
-
-  // Set fields
-  document.getElementById('popupName').textContent = builder.name
-  document.getElementById('popupLocation').textContent = `📍 ${builder.location_city}, ${builder.location_country}`
-
-  const impactTag = document.getElementById('popupImpact')
-  impactTag.textContent = builder.impact_area || 'Other'
-  impactTag.className = `popup-impact-tag impact-${builder.impact_area}`
-
-  document.getElementById('popupBuilding').textContent = builder.what_building || '—'
-  document.getElementById('popupSkills').textContent = builder.skills || '—'
-
-  const workLink = document.getElementById('popupWorkLink')
-  if (builder.work_link) {
-    workLink.href = builder.work_link
-    workLink.style.display = 'inline-flex'
-  } else {
-    workLink.style.display = 'none'
-  }
-
-  // Collab button state
-  const actions = document.getElementById('popupActions')
-  if (sentRequests.has(builder.id)) {
-    actions.innerHTML = `
-      <div class="collab-sent">✓ Request Sent</div>
-      <button class="btn-view-full" onclick="viewFullProfile()">Full Profile</button>
-    `
-  } else {
-    actions.innerHTML = `
-      <button class="btn-collab" id="collabBtn" onclick="openCollabModal()">⚡ Collab</button>
-      <button class="btn-view-full" onclick="viewFullProfile()">Full Profile</button>
-    `
-  }
-
-  // Open popup
-  document.getElementById('profilePopup').classList.add('open')
-
-  // Pan map to builder
-  if (map && builder.location_lat && currentView === 'map') {
-    map.panTo([builder.location_lat, builder.location_lng], { animate: true })
-  }
+function renderFeed(posts){
+  const el=document.getElementById('feedPosts')
+  el.innerHTML=posts.length?posts.map(renderPost).join(''):`<div class="empty-state"><div class="empty-title">No posts here yet.</div><div class="empty-sub">Be the first to share your build.</div></div>`
 }
 
-function closePopup() {
-  document.getElementById('profilePopup').classList.remove('open')
-  selectedBuilder = null
-}
-window.closePopup = closePopup
+// Show mock posts immediately on page load
+renderFeed(MOCK)
 
-window.viewFullProfile = function() {
-  if (selectedBuilder) {
-    // Store in session for full profile page
-    sessionStorage.setItem('viewingBuilder', JSON.stringify(selectedBuilder))
-    // For now just close — full profile page can be built next
-    showToast('Full profile page coming soon')
-  }
-}
-
-// ── COLLAB MODAL ──
-window.openCollabModal = function() {
-  if (!selectedBuilder) return
-
-  document.getElementById('modalReceiverName').textContent = selectedBuilder.name
-  document.getElementById('modalReceiverProject').textContent =
-    selectedBuilder.what_building?.substring(0, 60) + (selectedBuilder.what_building?.length > 60 ? '...' : '') || '—'
-
-  const avatar = document.getElementById('modalReceiverAvatar')
-  avatar.innerHTML = selectedBuilder.profile_photo
-    ? `<img src="${selectedBuilder.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-    : '🌍'
-
-  document.getElementById('collabMessage').value = ''
-  document.getElementById('collabCounter').textContent = '0 / 150 words'
-  document.getElementById('sendCollabBtn').disabled = false
-  document.getElementById('collabModal').classList.add('active')
-}
-
-window.closeCollabModal = function() {
-  document.getElementById('collabModal').classList.remove('active')
-}
-
-// Word counter on textarea
-document.getElementById('collabMessage').addEventListener('input', function() {
-  const words = this.value.trim() === '' ? 0 : this.value.trim().split(/\s+/).length
-  const counter = document.getElementById('collabCounter')
-  counter.textContent = `${words} / 150 words`
-  counter.className = words > 150 ? 'modal-counter over' : 'modal-counter'
-  document.getElementById('sendCollabBtn').disabled = words > 150 || words === 0
-})
-
-// ── SEND COLLAB REQUEST ──
-window.sendCollabRequest = async function() {
-  if (!selectedBuilder || !currentUser) return
-
-  const message = document.getElementById('collabMessage').value.trim()
-  if (!message) return
-
-  const words = message.split(/\s+/).length
-  if (words > 150) return
-
-  document.getElementById('sendCollabBtn').disabled = true
-  document.getElementById('sendCollabBtn').textContent = 'Sending...'
-
-  const { error } = await supabase
-    .from('collab_requests')
-    .insert({
-      sender_id: currentUser.id,
-      receiver_id: selectedBuilder.id,
-      message,
-      status: 'pending'
+// Then try to load real posts
+async function loadReal(){
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/feed_posts?select=*,users(id,name,profile_photo,location_city,location_country,impact_area)&order=created_at.desc&limit=30`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
     })
+    const data = await res.json()
+    if(Array.isArray(data)&&data.length>0) renderFeed(data)
+  } catch(e){ /* keep mock posts */ }
+}
+loadReal()
 
-  if (error) {
-    console.error('Collab request error:', error)
-    document.getElementById('sendCollabBtn').disabled = false
-    document.getElementById('sendCollabBtn').textContent = '⚡ Send Request'
-    showToast('Something went wrong. Try again.')
-    return
-  }
 
-  // Update local state
-  sentRequests.add(selectedBuilder.id)
 
-  // Close modal
-  closeCollabModal()
-
-  // Update popup button
-  const actions = document.getElementById('popupActions')
-  if (actions) {
-    actions.innerHTML = `
-      <div class="collab-sent">✓ Request Sent</div>
-      <button class="btn-view-full" onclick="viewFullProfile()">Full Profile</button>
-    `
-  }
-
-  showToast('Collab request sent ⚡')
+// Compose
+function openCompose(){ document.getElementById('composeModal').classList.add('active') }
+function closeCompose(){
+  document.getElementById('composeModal').classList.remove('active')
+  document.getElementById('postContent').value=''
+  document.getElementById('postProject').value=''
+}
+function selectType(el){
+  document.querySelectorAll('.type-opt').forEach(o=>o.classList.remove('selected'))
+  el.classList.add('selected')
+  selectedPostType=el.dataset.type
 }
 
-// ── SEARCH ──
-document.getElementById('searchInput').addEventListener('input', function() {
-  filterBuilders()
-})
-
-// ── FILTER PILLS ──
-document.getElementById('filterPills').addEventListener('click', function(e) {
-  const pill = e.target.closest('.filter-pill')
-  if (!pill) return
-
-  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'))
-  pill.classList.add('active')
-  activeFilter = pill.dataset.filter
-  filterBuilders()
-})
-
-function filterBuilders() {
-  const search = document.getElementById('searchInput').value.toLowerCase().trim()
-
-  filteredBuilders = allBuilders.filter(b => {
-    const matchesFilter = activeFilter === 'all' || b.impact_area === activeFilter
-    const matchesSearch = !search ||
-      b.name?.toLowerCase().includes(search) ||
-      b.what_building?.toLowerCase().includes(search) ||
-      b.skills?.toLowerCase().includes(search) ||
-      b.location_city?.toLowerCase().includes(search) ||
-      b.location_country?.toLowerCase().includes(search)
-    return matchesFilter && matchesSearch
-  })
-
-  plotMarkers(filteredBuilders)
-  renderList(filteredBuilders)
-  document.getElementById('liveCount').textContent = filteredBuilders.length
+async function submitPost(){
+  const content=document.getElementById('postContent').value.trim()
+  const project=document.getElementById('postProject').value.trim()
+  if(!project){showToast('Project name required');return}
+  if(!content){showToast('Tell us what happened');return}
+  const btn=document.getElementById('postBtn')
+  btn.disabled=true;btn.textContent='Posting...'
+  try {
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/feed_posts`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({user_id:currentUser||'demo',post_type:selectedPostType,project_name:project,content})
+    })
+    closeCompose()
+    showToast('Posted ✦')
+    loadReal()
+  } catch(e){ showToast('Something went wrong') }
+  btn.disabled=false;btn.textContent='✦ Post'
 }
 
-// ── VIEW TOGGLE ──
-window.switchView = function(view) {
-  currentView = view
-  const listView = document.getElementById('listView')
-  const mapViewBtn = document.getElementById('mapViewBtn')
-  const listViewBtn = document.getElementById('listViewBtn')
-
-  if (view === 'list') {
-    listView.classList.add('active')
-    mapViewBtn.classList.remove('active')
-    listViewBtn.classList.add('active')
-  } else {
-    listView.classList.remove('active')
-    mapViewBtn.classList.add('active')
-    listViewBtn.classList.remove('active')
-  }
-
-  closePopup()
+function showToast(msg){
+  const t=document.getElementById('toast')
+  t.textContent=msg;t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2500)
 }
 
-// ── TOAST ──
-function showToast(msg, duration = 3000) {
-  const toast = document.getElementById('toast')
-  toast.textContent = msg
-  toast.classList.add('show')
-  setTimeout(() => toast.classList.remove('show'), duration)
-}
-
-// ── REALTIME — new builders appear live ──
-const channel = supabase
-  .channel('public:users')
-  .on('postgres_changes', {
-    event: 'UPDATE',
-    schema: 'public',
-    table: 'users',
-    filter: 'status=eq.active'
-  }, async (payload) => {
-    // Reload builders when someone goes live
-    await loadBuilders()
-  })
-  .subscribe()
-
+// Try to get current user in background
+;(async()=>{
+  try {
+    const res=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}})
+    const u=await res.json()
+    if(u&&u.id){
+      currentUser=u.id
+      if(u.profile_photo){
+        document.getElementById('navAvatar').innerHTML=`<img src="${u.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+      }
+    }
+  } catch(e){}
+})()
 </script>
 </body>
 </html>
