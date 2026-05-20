@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collab — Aetheria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#041008;--water:#4ECDC4;--water-2:#2A8A7A;
+  --amber:#D4820A;--gold:#C4944A;--gold-2:#FFD080;--cream:#F0E0C0;
+  --text-1:#F0E8D0;--text-2:rgba(240,232,208,.7);--text-3:rgba(240,232,208,.4);
+  --border:rgba(78,205,196,.12);--card-bg:rgba(6,26,14,.92);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--void);}
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:linear-gradient(180deg,#0A1828 0%,#0A3018 40%,#041008 100%);
+  cursor:none;display:flex;flex-direction:column;
+  height:100vh;overflow:hidden;
+}
+.cursor{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--water);box-shadow:0 0 10px rgba(78,205,196,.6);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;}
+.cursor-ring{position:fixed;width:26px;height:26px;border-radius:50%;border:1px solid rgba(78,205,196,.3);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+
+/* TOP NAV */
+.top-nav{
+  background:rgba(4,16,8,.97);border-bottom:1px solid var(--border);
+  padding:0 16px;display:flex;align-items:center;
+  height:56px;gap:12px;flex-shrink:0;z-index:500;
+}
+.back-btn{
+  font-family:'Cinzel',serif;font-size:10px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-3);border:none;background:transparent;
+  cursor:pointer;padding:6px;transition:color .2s;
+}
+.back-btn:hover{color:var(--text-2);}
+.partner-info{flex:1;}
+.partner-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text-1);}
+.partner-project{font-size:11px;color:var(--text-3);font-style:italic;}
+.connection{display:flex;align-items:center;gap:5px;margin-right:12px;}
+.conn-av{width:26px;height:26px;border-radius:50%;border:1px solid rgba(78,205,196,.25);display:flex;align-items:center;justify-content:center;font-size:11px;background:rgba(10,48,24,.8);}
+.conn-line{width:20px;height:1px;background:linear-gradient(to right,rgba(78,205,196,.3),rgba(78,205,196,.8),rgba(78,205,196,.3));}
+.conn-dot{width:5px;height:5px;border-radius:50%;background:var(--water);box-shadow:0 0 6px var(--water);animation:dp 2s ease-in-out infinite;}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.4}}
+.btn-schedule{
+  font-family:'Cinzel',serif;font-size:9px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold-2);border:1px solid rgba(255,208,128,.25);
+  background:rgba(255,208,128,.06);border-radius:2px;
+  padding:8px 12px;cursor:pointer;transition:all .2s;
+  white-space:nowrap;
+}
+.btn-schedule:hover{background:rgba(255,208,128,.12);}
+
+/* PROFILE PEEK */
+.profile-peek{
+  background:rgba(4,16,8,.95);border-bottom:1px solid var(--border);
+  padding:16px 20px;flex-shrink:0;
+}
+.peek-row{display:flex;gap:14px;align-items:flex-start;}
+.peek-avatar{width:50px;height:50px;border-radius:50%;border:2px solid rgba(78,205,196,.3);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;background:rgba(10,48,24,.8);flex-shrink:0;box-shadow:0 0 14px rgba(78,205,196,.15);}
+.peek-body{flex:1;}
+.peek-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
+.peek-loc{font-size:11px;color:var(--text-3);letter-spacing:1px;margin-bottom:6px;}
+.peek-tag{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border-radius:20px;border:1px solid rgba(78,205,196,.25);color:var(--water);display:inline-block;margin-bottom:8px;}
+.peek-fl{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;}
+.peek-fv{font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:8px;}
+.peek-link{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--water);text-decoration:none;border-bottom:1px solid rgba(78,205,196,.3);}
+.peek-close{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);border:none;background:transparent;cursor:pointer;padding:4px;flex-shrink:0;}
+
+/* TABS */
+.chat-tabs{display:flex;border-bottom:1px solid var(--border);background:rgba(4,16,8,.85);flex-shrink:0;}
+.chat-tab{font-family:'Cinzel',serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);padding:11px 18px;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.chat-tab.active{color:var(--water);border-bottom-color:var(--water);}
+
+/* MESSAGES */
+.messages{
+  flex:1;overflow-y:auto;padding:20px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.messages::-webkit-scrollbar{width:3px;}
+.messages::-webkit-scrollbar-thumb{background:rgba(78,205,196,.15);border-radius:2px;}
+
+.msg{display:flex;gap:8px;max-width:80%;}
+.msg.sent{align-self:flex-end;flex-direction:row-reverse;}
+.msg.received{align-self:flex-start;}
+
+.msg-av{
+  width:26px;height:26px;border-radius:50%;
+  border:1px solid rgba(78,205,196,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;flex-shrink:0;overflow:hidden;
+  background:rgba(10,48,24,.8);
+}
+
+.msg-bubble{
+  border-radius:2px;padding:10px 13px;
+  font-family:'Rajdhani',sans-serif;font-size:15px;
+  line-height:1.6;
+}
+/* RECEIVED — light text on dark green */
+.msg.received .msg-bubble{
+  background:rgba(10,48,24,.85);
+  border:1px solid rgba(78,205,196,.1);
+  color:var(--text-1);
+}
+/* SENT — light text on teal dark */
+.msg.sent .msg-bubble{
+  background:rgba(42,138,122,.3);
+  border:1px solid rgba(78,205,196,.25);
+  color:var(--text-1);
+}
+
+.msg-time{font-size:10px;color:var(--text-3);margin-top:3px;letter-spacing:1px;}
+.msg.sent .msg-time{text-align:right;}
+
+.msg-system{
+  text-align:center;font-family:'Cormorant Garamond',serif;
+  font-size:13px;font-style:italic;color:var(--text-3);
+  padding:6px;align-self:center;
+}
+
+/* PANELS */
+.panel{flex:1;padding:24px;overflow-y:auto;display:none;}
+.panel-empty{
+  text-align:center;padding:60px 0;
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-style:italic;color:var(--text-3);
+  line-height:1.7;
+}
+
+/* Call card */
+.call-card{
+  background:rgba(196,148,74,.06);border:1px solid rgba(196,148,74,.2);
+  border-radius:2px;padding:20px;margin-bottom:12px;
+}
+.call-status{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.call-date{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text-1);margin-bottom:4px;}
+.call-detail{font-size:13px;color:var(--text-2);line-height:1.6;}
+.btn-join{
+  margin-top:12px;font-family:'Cinzel',serif;font-size:10px;
+  font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:#04100A;background:linear-gradient(135deg,var(--water),var(--water-2));
+  border:none;border-radius:2px;padding:10px 20px;cursor:pointer;
+}
+
+/* CHAT INPUT */
+.chat-input-wrap{
+  padding:13px 16px;border-top:1px solid var(--border);
+  background:rgba(4,16,8,.92);display:flex;gap:10px;
+  align-items:flex-end;flex-shrink:0;
+}
+.chat-input{
+  flex:1;background:rgba(10,48,24,.7);
+  border:1px solid var(--border);border-radius:2px;
+  padding:11px 13px;font-family:'Rajdhani',sans-serif;
+  font-size:15px;color:var(--text-1);outline:none;
+  resize:none;line-height:1.5;max-height:120px;
+  transition:border-color .2s;
+}
+.chat-input::placeholder{color:var(--text-3);}
+.chat-input:focus{border-color:rgba(78,205,196,.35);}
+.btn-send{
+  font-family:'Cinzel',serif;font-size:10px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  color:#04100A;background:linear-gradient(135deg,var(--water),var(--water-2));
+  border:none;border-radius:2px;padding:11px 16px;cursor:pointer;
+  flex-shrink:0;transition:all .2s;
+}
+.btn-send:hover{box-shadow:0 2px 12px rgba(78,205,196,.4);}
+
+/* SCHEDULE MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(4,16,8,.88);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.active{display:flex;}
+.modal{width:100%;max-width:440px;background:rgba(4,16,8,.98);border:1px solid var(--border);border-top:2px solid var(--gold-2);border-radius:2px;padding:26px;animation:mu .3s ease;}
+@keyframes mu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--text-1);margin-bottom:4px;}
+.modal-sub{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--text-3);margin-bottom:20px;}
+.mf{margin-bottom:14px;}
+.ml{display:block;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text-2);margin-bottom:5px;}
+.mi{width:100%;background:rgba(10,48,24,.7);border:1px solid var(--border);border-radius:2px;padding:11px 13px;font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--text-1);outline:none;transition:border-color .2s;}
+.mi:focus{border-color:rgba(255,208,128,.4);}
+.mi option{background:#0A3018;color:var(--text-1);}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.btn-confirm{flex:1;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#04100A;background:linear-gradient(135deg,var(--gold-2),var(--amber));border:none;border-radius:2px;padding:14px;cursor:pointer;}
+.btn-mcancel{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);background:transparent;border:1px solid rgba(255,255,255,.06);border-radius:2px;padding:14px 16px;cursor:pointer;}
+
+/* TOAST */
+.toast{position:fixed;top:66px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:900;background:rgba(10,48,24,.95);border:1px solid rgba(78,205,196,.3);border-radius:2px;padding:10px 22px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--water);opacity:0;transition:all .3s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* BOTTOM NAV */
+.bottom-nav{background:rgba(4,16,8,.97);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 12px;flex-shrink:0;z-index:500;}
+.btab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 16px;cursor:pointer;border:none;background:transparent;}
+.btab-icon{font-size:20px;line-height:1;}
+.btab-lbl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);}
+.btab.active .btab-lbl{color:var(--water);}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="cursor" id="C"></div>
+<div class="cursor-ring" id="CR"></div>
+<div class="toast" id="toast"></div>
+
+<nav class="top-nav">
+  <button class="back-btn" onclick="location.href='/Aetheria/dashboard.html'">← Map</button>
+  <div class="partner-info">
+    <div class="partner-name" id="partnerName">Julian B.</div>
+    <div class="partner-project" id="partnerProject">Plastic to Fuel Converter</div>
+  </div>
+  <div class="connection">
+    <div class="conn-av" id="myAv">◎</div>
+    <div class="conn-line"></div>
+    <div class="conn-dot"></div>
+    <div class="conn-line"></div>
+    <div class="conn-av" id="theirAv">🌍</div>
+  </div>
+  <button class="btn-schedule" onclick="openSchedule()">📅 Schedule Call</button>
+</nav>
+
+<div class="profile-peek" id="profilePeek">
+  <div class="peek-row">
+    <div class="peek-avatar" id="peekAvatar">🌍</div>
+    <div class="peek-body">
+      <div class="peek-name" id="peekName">Julian B.</div>
+      <div class="peek-loc" id="peekLoc">📍 Atlanta, USA</div>
+      <div class="peek-tag" id="peekTag">Climate</div>
+      <div class="peek-fl">What They're Building</div>
+      <div class="peek-fv" id="peekBuilding">Plastic to Fuel Converter — open source pyrolysis for coastal communities</div>
+      <div class="peek-fl">What They Bring</div>
+      <div class="peek-fv" id="peekSkills">Chemical engineering, nonprofit ops, community deployment</div>
+      <a class="peek-link" id="peekLink" href="#" target="_blank">↗ View Their Work</a>
+    </div>
+    <button class="peek-close" onclick="togglePeek()">Hide ↑</button>
+  </div>
+</div>
+
+<div class="chat-tabs">
+  <button class="chat-tab active" onclick="showTab('chat',this)">💬 Chat</button>
+  <button class="chat-tab" onclick="showTab('files',this)">📎 Files</button>
+  <button class="chat-tab" onclick="showTab('calls',this)">📅 Calls</button>
+  <button class="chat-tab" onclick="showTab('profile',this)">◎ Their Profile</button>
+</div>
+
+<div class="messages" id="messages"></div>
+
+<div class="panel" id="filesPanel">
+  <div class="panel-empty">Share links to files, prototypes, or assets in the chat<br>and they will appear here.</div>
+</div>
+
+<div class="panel" id="callsPanel">
+  <div id="callsList">
+    <div class="panel-empty">No calls scheduled yet.<br>Hit Schedule Call to propose a time.</div>
+  </div>
+</div>
+
+<div class="panel" id="profilePanel">
+  <div style="max-width:500px;margin:0 auto;">
+    <div style="font-family:Cormorant Garamond,serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--water);margin-bottom:16px;">Builder Profile</div>
+    <div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:600;color:var(--text-1);margin-bottom:4px;" id="ppName">Julian B.</div>
+    <div style="font-size:12px;color:var(--text-3);letter-spacing:1px;margin-bottom:16px;" id="ppLoc">📍 Atlanta, USA</div>
+    <div style="font-family:Rajdhani,sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">What They're Building</div>
+    <div style="font-size:15px;color:var(--text-2);line-height:1.7;margin-bottom:16px;" id="ppBuilding"></div>
+    <div style="font-family:Rajdhani,sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">What They Bring</div>
+    <div style="font-size:15px;color:var(--text-2);line-height:1.7;margin-bottom:16px;" id="ppSkills"></div>
+    <a style="font-family:Cinzel,serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--water);text-decoration:none;border-bottom:1px solid rgba(78,205,196,.3);padding-bottom:2px;" id="ppLink" href="#" target="_blank">↗ View Their Work</a>
+  </div>
+</div>
+
+<div class="chat-input-wrap" id="chatInputWrap">
+  <textarea class="chat-input" id="chatInput" rows="1" placeholder="Write a message..." onkeydown="handleKey(event)"></textarea>
+  <button class="btn-send" onclick="sendMessage()">Send</button>
+</div>
+
+<div class="modal-overlay" id="scheduleModal">
+  <div class="modal">
+    <div class="modal-title">Schedule a Call</div>
+    <div class="modal-sub">Propose a time. They confirm or counter.</div>
+    <div class="mf"><label class="ml">Date</label><input class="mi" type="date" id="callDate"></div>
+    <div class="mf"><label class="ml">Time</label><input class="mi" type="time" id="callTime"></div>
+    <div class="mf">
+      <label class="ml">Duration</label>
+      <select class="mi" id="callDuration">
+        <option value="30">30 minutes</option>
+        <option value="60" selected>1 hour</option>
+        <option value="90">90 minutes</option>
+        <option value="120">2 hours</option>
+      </select>
+    </div>
+    <div class="mf"><label class="ml">Agenda (optional)</label><input class="mi" type="text" id="callAgenda" placeholder="What will you cover?"></div>
+    <div class="modal-actions">
+      <button class="btn-mcancel" onclick="closeSchedule()">Cancel</button>
+      <button class="btn-confirm" onclick="scheduleCall()">📅 Propose Call</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="btab" onclick="location.href='/Aetheria/dashboard.html'"><div class="btab-icon">🌍</div><div class="btab-lbl">Aetheria</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/feed.html'"><div class="btab-icon">✦</div><div class="btab-lbl">Feed</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/scribe.html'"><div class="btab-icon">📜</div><div class="btab-lbl">Scribe</div></button>
+  <button class="btab active"><div class="btab-icon">💬</div><div class="btab-lbl">Collabs</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/profile.html'"><div class="btab-icon">◎</div><div class="btab-lbl">Profile</div></button>
+</nav>
+
+<script>
+// Single script block — no duplicates
+const C=document.getElementById('C'),CR=document.getElementById('CR')
+let mx=0,my=0,rx=0,ry=0
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px'})
+;(function aR(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(aR)})()
+
+// Load partner from session or use demo data
+let partner = null
+try { partner = JSON.parse(sessionStorage.getItem('collabPartner') || sessionStorage.getItem('viewingBuilder')) } catch(e){}
+if(!partner) partner = {
+  name:'Julian B.',profile_photo:null,
+  location_city:'Atlanta',location_country:'USA',
+  impact_area:'Climate',
+  what_building:'Plastic to Fuel Converter — open source pyrolysis technology for coastal communities without waste infrastructure',
+  skills:'Chemical engineering, nonprofit operations, community deployment',
+  work_link:'https://jabinnovations.org'
+}
+
+// Populate all partner fields
+const firstName = partner.name.split(' ')[0]
+document.getElementById('partnerName').textContent = partner.name
+document.getElementById('partnerProject').textContent = (partner.what_building||'').substring(0,55)+'...'
+document.getElementById('chatInput').placeholder = `Write a message to ${firstName}...`
+
+function setAv(el, src){
+  if(src) el.innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+}
+setAv(document.getElementById('theirAv'), partner.profile_photo)
+setAv(document.getElementById('peekAvatar'), partner.profile_photo)
+
+document.getElementById('peekName').textContent = partner.name
+document.getElementById('peekLoc').textContent = `📍 ${partner.location_city}, ${partner.location_country}`
+document.getElementById('peekTag').textContent = partner.impact_area || 'Builder'
+document.getElementById('peekBuilding').textContent = partner.what_building || '—'
+document.getElementById('peekSkills').textContent = partner.skills || '—'
+if(partner.work_link) document.getElementById('peekLink').href = partner.work_link
+
+document.getElementById('ppName').textContent = partner.name
+document.getElementById('ppLoc').textContent = `📍 ${partner.location_city}, ${partner.location_country}`
+document.getElementById('ppBuilding').textContent = partner.what_building || '—'
+document.getElementById('ppSkills').textContent = partner.skills || '—'
+if(partner.work_link) document.getElementById('ppLink').href = partner.work_link
+
+// Mock messages
+let messages = [
+  {sender:'them', content:`Hey — I saw your profile on the map. What you're building is exactly adjacent to what we need for our deployment sites.`, time:'2d ago'},
+  {sender:'me', content:`I was thinking the same thing. The plastic to fuel work combined with what I'm building — these problems are connected. Let's talk.`, time:'2d ago'},
+  {sender:'them', content:`I've been trying to find someone working on the health infrastructure side for months. Can we get on a call this week?`, time:'1d ago'},
+  {sender:'me', content:`Yes. Let's schedule something. I want to show you what we've built and hear your deployment strategy.`, time:'1d ago'},
+  {sender:'them', content:`This is exactly why Aetheria needed to exist.`, time:'20h ago'},
+]
+
+const partnerAv = partner.profile_photo
+  ? `<img src="${partner.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+  : '🌍'
+
+function renderMessages(){
+  const el = document.getElementById('messages')
+  el.innerHTML = `<div class="msg-system">⚡ Collab accepted — workspace unlocked</div>`
+  el.innerHTML += messages.map(m=>`
+    <div class="msg ${m.sender==='me'?'sent':'received'}">
+      ${m.sender!=='me'?`<div class="msg-av">${partnerAv}</div>`:''}
+      <div>
+        <div class="msg-bubble">${m.content}</div>
+        <div class="msg-time">${m.time}</div>
+      </div>
+    </div>`).join('')
+  setTimeout(()=>{el.scrollTop=el.scrollHeight},50)
+}
+renderMessages()
+
+function sendMessage(){
+  const input = document.getElementById('chatInput')
+  const text = input.value.trim()
+  if(!text) return
+  messages.push({sender:'me', content:text, time:'just now'})
+  input.value = ''
+  input.style.height = 'auto'
+  renderMessages()
+}
+
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}
+  const ta = document.getElementById('chatInput')
+  ta.style.height = 'auto'
+  ta.style.height = Math.min(ta.scrollHeight, 120)+'px'
+}
+
+let peekVisible = true
+function togglePeek(){
+  peekVisible = !peekVisible
+  document.getElementById('profilePeek').style.display = peekVisible ? 'block' : 'none'
+  document.querySelector('.peek-close').textContent = peekVisible ? 'Hide ↑' : 'Show ↓'
+}
+
+function showTab(tab, el){
+  document.querySelectorAll('.chat-tab').forEach(t=>t.classList.remove('active'))
+  el.classList.add('active')
+  const isChat = tab==='chat'
+  const isChatOrProfile = isChat || tab==='profile'
+  document.getElementById('messages').style.display = isChat ? 'flex' : 'none'
+  document.getElementById('chatInputWrap').style.display = isChat ? 'flex' : 'none'
+  document.getElementById('filesPanel').style.display = tab==='files' ? 'block' : 'none'
+  document.getElementById('callsPanel').style.display = tab==='calls' ? 'block' : 'none'
+  document.getElementById('profilePanel').style.display = tab==='profile' ? 'block' : 'none'
+  if(tab==='profile'){
+    document.getElementById('profilePeek').style.display = 'none'
+  } else {
+    document.getElementById('profilePeek').style.display = peekVisible ? 'block' : 'none'
+  }
+}
+
+function openSchedule(){
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate()+1)
+  document.getElementById('callDate').value = tomorrow.toISOString().split('T')[0]
+  document.getElementById('callTime').value = '10:00'
+  document.getElementById('scheduleModal').classList.add('active')
+}
+
+function closeSchedule(){ document.getElementById('scheduleModal').classList.remove('active') }
+
+function scheduleCall(){
+  const date = document.getElementById('callDate').value
+  const time = document.getElementById('callTime').value
+  const duration = document.getElementById('callDuration').value
+  const agenda = document.getElementById('callAgenda').value
+  if(!date||!time){ showToast('Set a date and time'); return }
+  const dt = new Date(`${date}T${time}`)
+  const dateStr = dt.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})
+  const timeStr = dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  messages.push({sender:'me',content:`📅 Call proposed: ${dateStr} at ${timeStr} (${duration} min)${agenda?' — '+agenda:''}`,time:'just now'})
+  document.getElementById('callsList').innerHTML=`
+    <div class="call-card">
+      <div class="call-status">📅 Proposed — Awaiting Confirmation from ${firstName}</div>
+      <div class="call-date">${dateStr}</div>
+      <div class="call-detail">${timeStr} · ${duration} minutes${agenda?'<br>'+agenda:''}</div>
+      <button class="btn-join" onclick="showToast('Call will start here when confirmed')">Join Call</button>
+    </div>`
+  closeSchedule()
+  renderMessages()
+  showToast('Call proposed 📅')
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast')
+  t.textContent = msg; t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'), 2500)
+}
+</script>
+</body>
+</html>
