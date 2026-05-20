@@ -1184,10 +1184,8 @@ window.closePopup = closePopup
 
 window.viewFullProfile = function() {
   if (selectedBuilder) {
-    // Store in session for full profile page
-    sessionStorage.setItem('viewingBuilder', JSON.stringify(selectedBuilder))
-    // For now just close — full profile page can be built next
-    showToast('Full profile page coming soon')
+    try{ sessionStorage.setItem('viewingBuilder', JSON.stringify(selectedBuilder)) }catch(e){}
+    window.location.href = '/Aetheria/builder.html'
   }
 }
 
