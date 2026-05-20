@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collabs — Aetheria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#041008;--water:#4ECDC4;--water-2:#2A8A7A;
+  --amber:#D4820A;--gold:#C4944A;--gold-2:#FFD080;--cream:#F0E0C0;
+  --text-1:#F0E8D0;--text-2:rgba(240,232,208,.7);--text-3:rgba(240,232,208,.38);
+  --border:rgba(78,205,196,.12);--card-bg:rgba(6,26,14,.9);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--void);}
+body{font-family:'Rajdhani',sans-serif;min-height:100vh;background:linear-gradient(180deg,#0A1828 0%,#0A3018 40%,#041008 100%);cursor:none;display:flex;flex-direction:column;}
+.cursor{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--water);box-shadow:0 0 10px rgba(78,205,196,.6);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;}
+.cursor-ring{position:fixed;width:26px;height:26px;border-radius:50%;border:1px solid rgba(78,205,196,.3);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+
+/* TOP NAV */
+.top-nav{position:sticky;top:0;z-index:500;background:rgba(4,16,8,.97);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:56px;gap:16px;}
+.nav-logo{font-family:'Cinzel',serif;font-size:18px;font-weight:900;letter-spacing:6px;background:linear-gradient(135deg,var(--cream),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-title{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--text-2);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--water-2),#0A3018);border:1.5px solid rgba(78,205,196,.3);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;overflow:hidden;}
+
+/* TABS */
+.tabs{background:rgba(4,16,8,.9);border-bottom:1px solid var(--border);display:flex;padding:0 20px;}
+.tab{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);padding:13px 18px;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.tab.active{color:var(--water);border-bottom-color:var(--water);}
+
+/* MAIN */
+.main{flex:1;max-width:640px;margin:0 auto;width:100%;padding:16px 16px 100px;}
+
+/* SECTION HEADER */
+.section-label{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--text-3);padding:12px 4px 8px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+
+/* COLLAB THREAD CARD */
+.thread-card{
+  background:var(--card-bg);border:1px solid var(--border);
+  border-radius:2px;padding:16px;margin-bottom:10px;
+  cursor:pointer;transition:all .2s;position:relative;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.thread-card:hover{border-color:rgba(78,205,196,.25);background:rgba(10,48,24,.8);transform:translateX(2px);}
+.thread-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:2px 0 0 2px;}
+.thread-card.active-collab::before{background:var(--water);}
+.thread-card.pending-in::before{background:var(--gold);}
+.thread-card.pending-out::before{background:var(--text-3);}
+
+.thread-avatar{width:46px;height:46px;border-radius:50%;border:1.5px solid rgba(78,205,196,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;background:rgba(10,48,24,.8);box-shadow:0 0 10px rgba(78,205,196,.1);}
+
+.thread-body{flex:1;min-width:0;}
+.thread-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px;}
+.thread-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text-1);}
+.thread-time{font-size:10px;color:var(--text-3);letter-spacing:1px;flex-shrink:0;margin-left:8px;}
+.thread-project{font-size:11px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.thread-preview{font-size:13px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5;}
+.thread-preview.unread{color:var(--text-2);font-weight:600;}
+
+/* Unread badge */
+.unread-dot{position:absolute;top:16px;right:16px;width:9px;height:9px;border-radius:50%;background:var(--water);box-shadow:0 0 8px var(--water);}
+
+/* Status tag */
+.thread-status{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border-radius:20px;border:1px solid;display:inline-block;margin-bottom:6px;}
+.status-active{color:var(--water);border-color:rgba(78,205,196,.3);background:rgba(78,205,196,.06);}
+.status-pending-in{color:var(--gold-2);border-color:rgba(255,208,128,.3);background:rgba(255,208,128,.06);}
+.status-pending-out{color:var(--text-3);border-color:rgba(255,255,255,.08);background:transparent;}
+
+/* REQUEST CARD */
+.request-card{
+  background:rgba(30,20,8,.6);border:1px solid rgba(196,148,74,.2);
+  border-radius:2px;padding:16px;margin-bottom:10px;
+  position:relative;
+}
+.request-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);border-radius:2px 0 0 2px;}
+.request-from{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.request-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+.request-avatar{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(196,148,74,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;background:rgba(30,18,4,.8);}
+.request-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
+.request-project{font-size:11px;color:var(--gold);letter-spacing:1px;}
+.request-msg{font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:2px;border-left:2px solid rgba(196,148,74,.2);}
+.request-actions{display:flex;gap:8px;}
+.btn-accept{flex:1;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#04100A;background:linear-gradient(135deg,var(--water),var(--water-2));border:none;border-radius:2px;padding:11px;cursor:pointer;transition:all .2s;}
+.btn-accept:hover{box-shadow:0 2px 12px rgba(78,205,196,.4);}
+.btn-counter{font-family:'Cinzel',serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold-2);background:transparent;border:1px solid rgba(255,208,128,.25);border-radius:2px;padding:11px 14px;cursor:pointer;transition:all .2s;}
+.btn-counter:hover{background:rgba(255,208,128,.06);}
+.btn-decline{font-family:'Cinzel',serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);background:transparent;border:1px solid rgba(255,255,255,.06);border-radius:2px;padding:11px 14px;cursor:pointer;transition:all .2s;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 24px;}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--text-2);margin-bottom:8px;}
+.empty-sub{font-size:14px;color:var(--text-3);line-height:1.6;max-width:320px;margin:0 auto 24px;}
+.btn-find{font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#04100A;background:linear-gradient(135deg,var(--water),var(--water-2));border:none;border-radius:2px;padding:14px 28px;cursor:pointer;box-shadow:0 4px 20px rgba(78,205,196,.3);}
+
+/* TOAST */
+.toast{position:fixed;top:66px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:900;background:rgba(10,48,24,.95);border:1px solid rgba(78,205,196,.3);border-radius:2px;padding:10px 22px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--water);opacity:0;transition:all .3s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(4,16,8,.97);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 12px;}
+.btab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 16px;cursor:pointer;border:none;background:transparent;}
+.btab-icon{font-size:20px;line-height:1;}
+.btab-lbl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);}
+.btab.active .btab-lbl{color:var(--water);}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="cursor" id="C"></div>
+<div class="cursor-ring" id="CR"></div>
+<div class="toast" id="toast"></div>
+
+<nav class="top-nav">
+  <div class="nav-logo">AETHERIA</div>
+  <div class="nav-title">Collabs</div>
+  <div class="nav-right">
+    <div class="nav-avatar" id="navAvatar">🌍</div>
+  </div>
+</nav>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('all',this)">All</button>
+  <button class="tab" onclick="showTab('active',this)">Active</button>
+  <button class="tab" onclick="showTab('requests',this)">Requests <span id="requestBadge"></span></button>
+  <button class="tab" onclick="showTab('pending',this)">Sent</button>
+</div>
+
+<div class="main" id="mainContent"></div>
+
+<nav class="bottom-nav">
+  <button class="btab" onclick="location.href='/Aetheria/dashboard.html'"><div class="btab-icon">🌍</div><div class="btab-lbl">Aetheria</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/feed.html'"><div class="btab-icon">✦</div><div class="btab-lbl">Feed</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/scribe.html'"><div class="btab-icon">📜</div><div class="btab-lbl">Scribe</div></button>
+  <button class="btab active"><div class="btab-icon">💬</div><div class="btab-lbl">Collabs</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/profile.html'"><div class="btab-icon">◎</div><div class="btab-lbl">Profile</div></button>
+</nav>
+
+<script>
+const C=document.getElementById('C'),CR=document.getElementById('CR')
+let mx=0,my=0,rx=0,ry=0
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px'})
+;(function aR(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(aR)})()
+
+let currentTab = 'all'
+
+// Mock data
+const ACTIVE_COLLABS = [
+  {
+    id:'c1',
+    partner:{name:'Julian B.',profile_photo:null,what_building:'Plastic to Fuel Converter',location_city:'Atlanta',location_country:'USA',impact_area:'Climate',skills:'Chemical engineering, nonprofit ops',work_link:'https://jabinnovations.org'},
+    lastMessage:'This is exactly why Aetheria needed to exist.',
+    lastTime:'20h ago',
+    unread:true
+  },
+  {
+    id:'c2',
+    partner:{name:'Moses W.',profile_photo:null,what_building:'Atmospheric Water Generator',location_city:'Houston',location_country:'USA',impact_area:'Water',skills:'Engineering, emergency deployment',work_link:'https://moseswestfoundation.org'},
+    lastMessage:'Let\'s build something together.',
+    lastTime:'3d ago',
+    unread:false
+  }
+]
+
+const INCOMING_REQUESTS = [
+  {
+    id:'r1',
+    sender:{name:'Amara K.',profile_photo:null,what_building:'Soil Regeneration System',location_city:'Nairobi',location_country:'Kenya',impact_area:'Food',skills:'Agronomy, community organizing',work_link:''},
+    message:'I have been following your water work for months. The communities I am working with in East Africa need both soil and water solutions and I think there is a real integration opportunity here. Would love to connect and explore what we could build together.',
+    time:'2h ago'
+  }
+]
+
+const SENT_REQUESTS = [
+  {
+    id:'s1',
+    receiver:{name:'Dr. Sofia M.',profile_photo:null,what_building:'Community Health Infrastructure',location_city:'Guatemala City',location_country:'Guatemala',impact_area:'Health'},
+    message:'Your community health deployment model is exactly what we need for our sites.',
+    status:'pending',
+    time:'1d ago'
+  }
+]
+
+function openCollab(partner) {
+  try { sessionStorage.setItem('collabPartner', JSON.stringify(partner)) } catch(e){}
+  location.href = '/Aetheria/collab.html'
+}
+
+function acceptRequest(id) {
+  const req = INCOMING_REQUESTS.find(r=>r.id===id)
+  if(!req) return
+  ACTIVE_COLLABS.unshift({
+    id:'new'+id,
+    partner:req.sender,
+    lastMessage:'Collab accepted — workspace unlocked',
+    lastTime:'just now',
+    unread:true
+  })
+  INCOMING_REQUESTS.splice(INCOMING_REQUESTS.indexOf(req),1)
+  showToast('Collab accepted ⚡')
+  render()
+}
+
+function declineRequest(id) {
+  const idx = INCOMING_REQUESTS.findIndex(r=>r.id===id)
+  if(idx>-1) INCOMING_REQUESTS.splice(idx,1)
+  showToast('Request declined')
+  render()
+}
+
+function av(p) {
+  return p.profile_photo
+    ? `<img src="${p.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+    : '🌍'
+}
+
+function renderActive() {
+  if(!ACTIVE_COLLABS.length) return `
+    <div class="empty">
+      <div class="empty-title">No active collabs yet.</div>
+      <div class="empty-sub">Find builders on the world map and hit Collab to start building together.</div>
+      <button class="btn-find" onclick="location.href='/Aetheria/dashboard.html'">Find Builders →</button>
+    </div>`
+
+  return `
+    <div class="section-label">Active Collaborations — ${ACTIVE_COLLABS.length}</div>
+    ${ACTIVE_COLLABS.map(c=>`
+      <div class="thread-card active-collab" onclick="openCollab(${JSON.stringify(c.partner).replace(/"/g,'&quot;')})">
+        <div class="thread-avatar">${av(c.partner)}</div>
+        <div class="thread-body">
+          <div class="thread-top">
+            <div class="thread-name">${c.partner.name}</div>
+            <div class="thread-time">${c.lastTime}</div>
+          </div>
+          <div class="thread-project">▸ ${c.partner.what_building?.substring(0,50)}...</div>
+          <div class="thread-preview ${c.unread?'unread':''}">${c.lastMessage}</div>
+        </div>
+        ${c.unread?'<div class="unread-dot"></div>':''}
+      </div>`).join('')}`
+}
+
+function renderRequests() {
+  if(!INCOMING_REQUESTS.length) return `
+    <div class="empty">
+      <div class="empty-title">No pending requests.</div>
+      <div class="empty-sub">When builders send you a collab request it will show up here.</div>
+    </div>`
+
+  return `
+    <div class="section-label">Incoming Requests — ${INCOMING_REQUESTS.length}</div>
+    ${INCOMING_REQUESTS.map(r=>`
+      <div class="request-card">
+        <div class="request-from">⚡ Collab Request</div>
+        <div class="request-top">
+          <div class="request-avatar">${av(r.sender)}</div>
+          <div>
+            <div class="request-name">${r.sender.name}</div>
+            <div class="request-project">▸ ${r.sender.what_building}</div>
+          </div>
+        </div>
+        <div class="request-msg">"${r.message}"</div>
+        <div class="request-actions">
+          <button class="btn-accept" onclick="acceptRequest('${r.id}')">⚡ Accept</button>
+          <button class="btn-counter" onclick="showToast('Counter message coming soon')">Counter</button>
+          <button class="btn-decline" onclick="declineRequest('${r.id}')">Decline</button>
+        </div>
+      </div>`).join('')}`
+}
+
+function renderSent() {
+  if(!SENT_REQUESTS.length) return `
+    <div class="empty">
+      <div class="empty-title">No sent requests.</div>
+      <div class="empty-sub">Find a builder on the map and hit Collab to send your first request.</div>
+      <button class="btn-find" onclick="location.href='/Aetheria/dashboard.html'">Find Builders →</button>
+    </div>`
+
+  return `
+    <div class="section-label">Sent Requests — ${SENT_REQUESTS.length}</div>
+    ${SENT_REQUESTS.map(s=>`
+      <div class="thread-card pending-out">
+        <div class="thread-avatar">${av(s.receiver)}</div>
+        <div class="thread-body">
+          <div class="thread-top">
+            <div class="thread-name">${s.receiver.name}</div>
+            <div class="thread-time">${s.time}</div>
+          </div>
+          <div class="thread-project">▸ ${s.receiver.what_building?.substring(0,50)}...</div>
+          <div class="thread-status status-pending-out">Awaiting Response</div>
+          <div class="thread-preview">"${s.message}"</div>
+        </div>
+      </div>`).join('')}`
+}
+
+function render() {
+  const main = document.getElementById('mainContent')
+  const badge = document.getElementById('requestBadge')
+  badge.textContent = INCOMING_REQUESTS.length ? ` (${INCOMING_REQUESTS.length})` : ''
+
+  if(currentTab === 'all') {
+    main.innerHTML = renderRequests() + renderActive() + renderSent()
+  } else if(currentTab === 'active') {
+    main.innerHTML = renderActive()
+  } else if(currentTab === 'requests') {
+    main.innerHTML = renderRequests()
+  } else if(currentTab === 'pending') {
+    main.innerHTML = renderSent()
+  }
+}
+
+function showTab(tab, el) {
+  currentTab = tab
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'))
+  el.classList.add('active')
+  render()
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast')
+  t.textContent=msg; t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2500)
+}
+
+// Initial render
+render()
+</script>
+</body>
+</html>
