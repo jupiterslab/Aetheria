@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Builder Profile — Aetheria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#041008;--water:#4ECDC4;--water-2:#2A8A7A;
+  --amber:#D4820A;--gold:#C4944A;--gold-2:#FFD080;--cream:#F0E0C0;
+  --text-1:#F0E8D0;--text-2:rgba(240,232,208,.7);--text-3:rgba(240,232,208,.38);
+  --border:rgba(78,205,196,.12);--card-bg:rgba(6,26,14,.9);
+  --progress:#4ECDC4;--breakthrough:#FFD080;--failure:#E07A5F;--collab-c:#C4944A;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--void);}
+body{font-family:'Rajdhani',sans-serif;min-height:100vh;background:linear-gradient(180deg,#0A1828 0%,#0A3018 40%,#041008 100%);cursor:none;display:flex;flex-direction:column;}
+.cursor{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--water);box-shadow:0 0 10px rgba(78,205,196,.6);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;}
+.cursor-ring{position:fixed;width:26px;height:26px;border-radius:50%;border:1px solid rgba(78,205,196,.3);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+
+/* TOP NAV */
+.top-nav{position:sticky;top:0;z-index:500;background:rgba(4,16,8,.97);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:56px;gap:12px;}
+.back-btn{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);border:none;background:transparent;cursor:pointer;padding:6px;transition:color .2s;display:flex;align-items:center;gap:6px;}
+.back-btn:hover{color:var(--text-2);}
+.nav-title{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--text-2);}
+
+/* HERO SECTION */
+.profile-hero{
+  position:relative;padding:32px 20px 24px;
+  background:linear-gradient(180deg,rgba(10,48,24,.6) 0%,transparent 100%);
+  border-bottom:1px solid var(--border);
+}
+
+/* Background dome glow */
+.hero-glow{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:300px;height:200px;
+  background:radial-gradient(ellipse,rgba(78,205,196,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.hero-inner{max-width:640px;margin:0 auto;position:relative;z-index:1;}
+
+.hero-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+
+/* Dome avatar */
+.dome-avatar-wrap{position:relative;flex-shrink:0;}
+.dome-avatar{
+  width:80px;height:64px;border-radius:50% 50% 0 0;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+  border-top:2px solid;
+  box-shadow:0 0 20px rgba(78,205,196,.2);
+}
+.dome-avatar img{width:100%;height:100%;object-fit:cover;}
+.dome-avatar-emoji{font-size:32px;}
+.dome-ring{
+  position:absolute;bottom:-2px;left:5%;right:5%;
+  height:3px;border-radius:2px;
+  animation:ring-pulse 2.5s ease-in-out infinite;
+}
+@keyframes ring-pulse{0%,100%{opacity:.6;box-shadow:0 0 8px currentColor}50%{opacity:1;box-shadow:0 0 20px currentColor,0 0 40px currentColor}}
+
+.hero-info{flex:1;min-width:0;}
+.builder-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--text-1);margin-bottom:4px;line-height:1.1;}
+.builder-location{font-size:12px;color:var(--text-3);letter-spacing:2px;margin-bottom:8px;}
+.builder-impact{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid;display:inline-block;margin-bottom:8px;}
+.builder-joined{font-size:11px;color:var(--text-3);letter-spacing:1px;}
+
+/* Stats row */
+.stats-row{display:flex;gap:20px;margin-bottom:16px;padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stat{text-align:center;}
+.stat-num{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:var(--text-1);line-height:1;}
+.stat-lbl{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin-top:3px;}
+
+/* COLLAB BUTTON */
+.collab-btn-wrap{margin-bottom:0;}
+.btn-collab-main{
+  width:100%;font-family:'Cinzel',serif;font-size:13px;
+  font-weight:700;letter-spacing:5px;text-transform:uppercase;
+  color:#04100A;background:linear-gradient(135deg,var(--water),var(--water-2));
+  border:none;border-radius:2px;padding:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 4px 24px rgba(78,205,196,.35);
+  transition:transform .2s,box-shadow .2s;
+}
+.btn-collab-main:hover{transform:translateY(-2px);box-shadow:0 6px 32px rgba(78,205,196,.5);}
+.btn-collab-main.sent{background:rgba(78,205,196,.1);border:1px solid rgba(78,205,196,.3);color:var(--water);box-shadow:none;cursor:default;}
+.btn-collab-main.sent:hover{transform:none;}
+
+/* CONTENT TABS */
+.content-tabs{display:flex;border-bottom:1px solid var(--border);background:rgba(4,16,8,.6);}
+.ctab{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);padding:13px 20px;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.ctab.active{color:var(--water);border-bottom-color:var(--water);}
+
+/* CONTENT PANELS */
+.panel{display:none;max-width:640px;margin:0 auto;width:100%;padding:20px 20px 100px;}
+.panel.active{display:block;}
+
+/* About panel */
+.about-field{margin-bottom:24px;}
+.about-label{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.about-value{font-size:16px;color:var(--text-2);line-height:1.75;}
+.work-link{display:inline-flex;align-items:center;gap:8px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--water);text-decoration:none;padding:8px 16px;border:1px solid rgba(78,205,196,.25);border-radius:2px;transition:all .2s;margin-top:4px;}
+.work-link:hover{background:rgba(78,205,196,.08);border-color:rgba(78,205,196,.5);}
+
+/* Posts panel */
+.post-card{background:var(--card-bg);border:1px solid var(--border);border-radius:2px;margin-bottom:14px;overflow:hidden;position:relative;}
+.post-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+.post-card.progress::before{background:var(--progress);}
+.post-card.breakthrough::before{background:var(--breakthrough);}
+.post-card.failure::before{background:var(--failure);}
+.post-card.collab_announcement::before{background:var(--collab-c);}
+.post-inner{padding:16px 16px 12px 20px;}
+.post-type-tag{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid;display:inline-block;margin-bottom:10px;}
+.tag-p{color:var(--progress);border-color:rgba(78,205,196,.3);background:rgba(78,205,196,.06);}
+.tag-b{color:var(--breakthrough);border-color:rgba(255,208,128,.3);background:rgba(255,208,128,.06);}
+.tag-f{color:var(--failure);border-color:rgba(224,122,95,.3);background:rgba(224,122,95,.06);}
+.tag-c{color:var(--collab-c);border-color:rgba(196,148,74,.3);background:rgba(196,148,74,.06);}
+.post-project{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:8px;}
+.post-body{font-size:15px;color:var(--text-2);line-height:1.7;margin-bottom:10px;}
+.post-time{font-size:10px;color:var(--text-3);letter-spacing:1px;}
+
+/* Scribe panel */
+.scribe-card{background:var(--card-bg);border:1px solid var(--border);border-radius:2px;margin-bottom:14px;overflow:hidden;position:relative;padding:18px 18px 14px 22px;}
+.scribe-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+.scribe-card.question::before{background:#4ECDC4;}
+.scribe-card.insight::before{background:#FFD080;}
+.scribe-card.motivator::before{background:#C084FC;}
+.scribe-card.observation::before{background:#FF8C00;}
+.scribe-type{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid;display:inline-block;margin-bottom:10px;}
+.st-q{color:#4ECDC4;border-color:rgba(78,205,196,.3);background:rgba(78,205,196,.06);}
+.st-i{color:#FFD080;border-color:rgba(255,208,128,.3);background:rgba(255,208,128,.06);}
+.st-m{color:#C084FC;border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.06);}
+.st-o{color:#FF8C00;border-color:rgba(255,140,0,.3);background:rgba(255,140,0,.06);}
+.scribe-body{font-family:'Lora',serif;font-size:15px;color:var(--text-1);line-height:1.8;margin-bottom:8px;}
+.scribe-time{font-size:10px;color:var(--text-3);}
+
+/* Empty panel */
+.panel-empty{text-align:center;padding:48px 0;font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--text-3);}
+
+/* COLLAB MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(4,16,8,.88);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{width:100%;max-width:640px;background:rgba(4,16,8,.98);border:1px solid var(--border);border-top:2px solid var(--water);border-radius:2px 2px 0 0;padding:24px;animation:mu .3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes mu{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--text-1);margin-bottom:4px;}
+.modal-sub{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--text-3);margin-bottom:16px;}
+.modal-receiver{display:flex;align-items:center;gap:10px;background:rgba(10,48,24,.5);border:1px solid var(--border);border-radius:2px;padding:12px 14px;margin-bottom:16px;}
+.modal-receiver-av{width:32px;height:32px;border-radius:50%;border:1px solid rgba(78,205,196,.3);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;}
+.modal-receiver-name{font-family:'Cinzel',serif;font-size:13px;color:var(--text-1);letter-spacing:1px;}
+.modal-receiver-project{font-size:12px;color:var(--text-3);font-style:italic;}
+.modal-prompt{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--water);margin-bottom:8px;}
+.modal-textarea{width:100%;background:rgba(10,48,24,.7);border:1px solid var(--border);border-radius:2px;padding:13px;font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--text-1);line-height:1.65;resize:vertical;min-height:110px;outline:none;transition:border-color .2s;}
+.modal-textarea::placeholder{color:var(--text-3);}
+.modal-textarea:focus{border-color:rgba(78,205,196,.4);}
+.modal-counter{text-align:right;font-size:11px;color:var(--text-3);margin-top:5px;margin-bottom:16px;}
+.modal-counter.over{color:#E05A5A;}
+.modal-actions{display:flex;gap:10px;}
+.btn-send{flex:1;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#04100A;background:linear-gradient(135deg,var(--water),var(--water-2));border:none;border-radius:2px;padding:15px;cursor:pointer;transition:all .2s;}
+.btn-send:disabled{opacity:.4;cursor:not-allowed;}
+.btn-cancel{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--text-3);background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:2px;padding:15px 18px;cursor:pointer;}
+
+/* TOAST */
+.toast{position:fixed;top:66px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:900;background:rgba(10,48,24,.95);border:1px solid rgba(78,205,196,.3);border-radius:2px;padding:10px 22px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--water);opacity:0;transition:all .3s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(4,16,8,.97);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 12px;}
+.btab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 16px;cursor:pointer;border:none;background:transparent;}
+.btab-icon{font-size:20px;line-height:1;}
+.btab-lbl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);}
+.btab.active .btab-lbl{color:var(--water);}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="cursor" id="C"></div>
+<div class="cursor-ring" id="CR"></div>
+<div class="toast" id="toast"></div>
+
+<nav class="top-nav">
+  <button class="back-btn" onclick="history.back()">← Back</button>
+  <div class="nav-title">Builder Profile</div>
+</nav>
+
+<!-- PROFILE HERO -->
+<div class="profile-hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="dome-avatar-wrap">
+        <div class="dome-avatar" id="domeAvatar" style="background:linear-gradient(180deg,rgba(78,205,196,.3) 0%,rgba(42,138,122,.2) 100%);border-color:var(--water);">
+          <div class="dome-avatar-emoji" id="avatarEmoji">🌍</div>
+        </div>
+        <div class="dome-ring" id="domeRing" style="background:var(--water);color:var(--water);"></div>
+      </div>
+      <div class="hero-info">
+        <div class="builder-name" id="builderName">Julian B.</div>
+        <div class="builder-location" id="builderLocation">📍 Atlanta, USA</div>
+        <div class="builder-impact" id="builderImpact">Climate</div>
+        <div class="builder-joined" id="builderJoined">Builder since 2024</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-num" id="statPosts">12</div>
+        <div class="stat-lbl">Feed Posts</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statScribe">8</div>
+        <div class="stat-lbl">Scribe Posts</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statCollabs">3</div>
+        <div class="stat-lbl">Collabs</div>
+      </div>
+    </div>
+
+    <div class="collab-btn-wrap">
+      <button class="btn-collab-main" id="collabBtn" onclick="openCollabModal()">
+        ⚡ Collab
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT TABS -->
+<div class="content-tabs">
+  <button class="ctab active" onclick="showPanel('about',this)">About</button>
+  <button class="ctab" onclick="showPanel('posts',this)">Feed Posts</button>
+  <button class="ctab" onclick="showPanel('scribe',this)">Scribe</button>
+</div>
+
+<!-- ABOUT PANEL -->
+<div class="panel active" id="panel-about">
+  <div class="about-field">
+    <div class="about-label">What I'm Building</div>
+    <div class="about-value" id="aboutBuilding">Plastic to Fuel Converter — open source pyrolysis technology for coastal communities without waste infrastructure. One ton of plastic produces 850 liters of usable fuel.</div>
+  </div>
+  <div class="about-field">
+    <div class="about-label">What I Bring</div>
+    <div class="about-value" id="aboutSkills">Chemical engineering, nonprofit operations, community deployment strategy, open source development.</div>
+  </div>
+  <div class="about-field">
+    <div class="about-label">Problem I'm Solving</div>
+    <div class="about-value" id="aboutProblem">Plastic waste is destroying coastal ecosystems while communities lack energy access. Converting waste plastic into fuel solves both problems simultaneously — at scale, for free.</div>
+  </div>
+  <div class="about-field">
+    <div class="about-label">Location</div>
+    <div class="about-value" id="aboutLocation">Atlanta, Georgia, USA</div>
+  </div>
+  <div class="about-field">
+    <div class="about-label">Their Work</div>
+    <a class="work-link" id="aboutWorkLink" href="https://jabinnovations.org" target="_blank" rel="noopener">↗ View Their Work</a>
+  </div>
+</div>
+
+<!-- POSTS PANEL -->
+<div class="panel" id="panel-posts">
+  <div id="postsContent"></div>
+</div>
+
+<!-- SCRIBE PANEL -->
+<div class="panel" id="panel-scribe">
+  <div id="scribeContent"></div>
+</div>
+
+<!-- COLLAB MODAL -->
+<div class="modal-overlay" id="collabModal">
+  <div class="modal">
+    <div class="modal-title">Send a Collab Request</div>
+    <div class="modal-sub">Tell them what you need and why they're the right fit.</div>
+    <div class="modal-receiver">
+      <div class="modal-receiver-av" id="modalAv">🌍</div>
+      <div>
+        <div class="modal-receiver-name" id="modalName">Julian B.</div>
+        <div class="modal-receiver-project" id="modalProject">Plastic to Fuel Converter</div>
+      </div>
+    </div>
+    <div class="modal-prompt">What do you need help with and why is this person the right fit?</div>
+    <textarea class="modal-textarea" id="collabMessage" placeholder="Be specific. What exactly do you need? Why them and not someone else?"></textarea>
+    <div class="modal-counter" id="collabCounter">0 / 150 words</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCollabModal()">Cancel</button>
+      <button class="btn-send" id="sendBtn" disabled onclick="sendCollabRequest()">⚡ Send Request</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="btab" onclick="location.href='/Aetheria/dashboard.html'"><div class="btab-icon">🌍</div><div class="btab-lbl">Aetheria</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/feed.html'"><div class="btab-icon">✦</div><div class="btab-lbl">Feed</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/scribe.html'"><div class="btab-icon">📜</div><div class="btab-lbl">Scribe</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/collabs.html'"><div class="btab-icon">💬</div><div class="btab-lbl">Collabs</div></button>
+  <button class="btab" onclick="location.href='/Aetheria/profile.html'"><div class="btab-icon">◎</div><div class="btab-lbl">Profile</div></button>
+</nav>
+
+<script>
+const C=document.getElementById('C'),CR=document.getElementById('CR')
+let mx=0,my=0,rx=0,ry=0
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px'})
+;(function aR(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(aR)})()
+
+// Load builder from session or use demo data
+let builder = null
+try { builder = JSON.parse(sessionStorage.getItem('viewingBuilder') || sessionStorage.getItem('collabPartner')) } catch(e){}
+
+if(!builder) builder = {
+  id:'demo',
+  name:'Julian B.',
+  profile_photo:null,
+  location_city:'Atlanta',
+  location_country:'USA',
+  impact_area:'Climate',
+  what_building:'Plastic to Fuel Converter — open source pyrolysis technology for coastal communities without waste infrastructure. One ton of plastic produces 850 liters of usable fuel.',
+  skills:'Chemical engineering, nonprofit operations, community deployment strategy, open source development.',
+  problem_solving:'Plastic waste is destroying coastal ecosystems while communities lack energy access. Converting waste plastic into fuel solves both problems simultaneously — at scale, for free.',
+  work_link:'https://jabinnovations.org',
+  created_at: new Date(Date.now() - 86400000 * 180).toISOString()
+}
+
+// Impact color map
+const IMPACT_COLORS = {
+  Climate:'#4ECDC4',Health:'#FF6B9D',Education:'#FFD080',
+  Technology:'#9B59B6',Infrastructure:'#E67E22',Food:'#27AE60',
+  Water:'#3498DB',Energy:'#F1C40F',Other:'#95A5A6'
+}
+const color = IMPACT_COLORS[builder.impact_area] || '#4ECDC4'
+
+// Populate hero
+document.getElementById('builderName').textContent = builder.name
+document.getElementById('builderLocation').textContent = `📍 ${builder.location_city}, ${builder.location_country}`
+document.getElementById('builderImpact').textContent = builder.impact_area || 'Builder'
+document.getElementById('builderImpact').style.cssText = `color:${color};border-color:${color}44;background:${color}11;`
+document.getElementById('builderJoined').textContent = `Builder since ${new Date(builder.created_at||Date.now()).getFullYear()}`
+document.getElementById('domeAvatar').style.borderColor = color
+document.getElementById('domeRing').style.background = color
+document.getElementById('domeRing').style.boxShadow = `0 0 10px ${color}`
+
+if(builder.profile_photo){
+  document.getElementById('domeAvatar').innerHTML = `<img src="${builder.profile_photo}" style="width:100%;height:100%;object-fit:cover;">`
+}
+
+// Populate about
+document.getElementById('aboutBuilding').textContent = builder.what_building || '—'
+document.getElementById('aboutSkills').textContent = builder.skills || '—'
+document.getElementById('aboutProblem').textContent = builder.problem_solving || '—'
+document.getElementById('aboutLocation').textContent = `${builder.location_city}, ${builder.location_country}`
+if(builder.work_link){
+  document.getElementById('aboutWorkLink').href = builder.work_link
+} else {
+  document.getElementById('aboutWorkLink').style.display = 'none'
+}
+
+// Modal fields
+document.getElementById('modalName').textContent = builder.name
+document.getElementById('modalProject').textContent = (builder.what_building||'').substring(0,60)+'...'
+if(builder.profile_photo){
+  document.getElementById('modalAv').innerHTML = `<img src="${builder.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+}
+
+// Mock posts
+const MOCK_POSTS = [
+  {post_type:'breakthrough',project_name:'Plastic to Fuel Converter',content:'After 8 months of testing we finally hit 94% conversion efficiency on mixed plastic waste. One ton of plastic now produces roughly 850 liters of usable fuel. Ready to scale.',created_at:new Date(Date.now()-3600000).toISOString()},
+  {post_type:'progress_update',project_name:'Plastic to Fuel Converter',content:'Deployed unit #12 in Accra. The community processed 2 tons of beach plastic in the first week. That is 1,700 liters of fuel that would otherwise have been zero. This is working.',created_at:new Date(Date.now()-604800000).toISOString()},
+  {post_type:'lessons_from_failure',project_name:'Plastic to Fuel Converter',content:'Unit #8 failed in humid conditions. Took us 3 weeks to diagnose. The moisture was degrading the catalytic converter faster than expected. Fixed now but an expensive lesson. Documenting everything so others don\'t repeat it.',created_at:new Date(Date.now()-1209600000).toISOString()},
+]
+
+const MOCK_SCRIBE = [
+  {post_type:'observation',content:'The people solving the world\'s most important problems are the most underfunded and the least visible. We built the wrong incentive system and then wondered why the world is the way it is.',created_at:new Date(Date.now()-86400000).toISOString()},
+  {post_type:'insight',content:'Open sourcing this technology was the best decision we made. We thought it would hurt us. Instead it brought us collaborators, funders, and deployments in 12 countries we never could have reached alone.',created_at:new Date(Date.now()-172800000).toISOString()},
+]
+
+const TYPE_MAP = {
+  progress_update:{label:'Progress',cls:'progress',tag:'tag-p'},
+  breakthrough:{label:'Breakthrough',cls:'breakthrough',tag:'tag-b'},
+  lessons_from_failure:{label:'Lessons',cls:'failure',tag:'tag-f'},
+  collab_announcement:{label:'Collab',cls:'collab_announcement',tag:'tag-c'}
+}
+
+const SCRIBE_MAP = {
+  question:{label:'❓ Question',cls:'question',tag:'st-q'},
+  insight:{label:'💡 Insight',cls:'insight',tag:'st-i'},
+  motivator:{label:'🔥 Motivator',cls:'motivator',tag:'st-m'},
+  observation:{label:'🌍 Observation',cls:'observation',tag:'st-o'}
+}
+
+function timeAgo(d){
+  const m=Math.floor((Date.now()-new Date(d))/60000)
+  if(m<60)return m+'m ago'
+  const h=Math.floor(m/60)
+  if(h<24)return h+'h ago'
+  const days=Math.floor(h/24)
+  if(days<30)return days+'d ago'
+  return Math.floor(days/30)+'mo ago'
+}
+
+document.getElementById('postsContent').innerHTML = MOCK_POSTS.map(p=>{
+  const t=TYPE_MAP[p.post_type]||TYPE_MAP.progress_update
+  return `<div class="post-card ${t.cls}">
+    <div class="post-inner">
+      <div class="post-type-tag ${t.tag}">${t.label}</div>
+      <div class="post-project">▸ ${p.project_name}</div>
+      <div class="post-body">${p.content}</div>
+      <div class="post-time">${timeAgo(p.created_at)}</div>
+    </div>
+  </div>`
+}).join('')
+
+document.getElementById('scribeContent').innerHTML = MOCK_SCRIBE.map(p=>{
+  const t=SCRIBE_MAP[p.post_type]||SCRIBE_MAP.observation
+  return `<div class="scribe-card ${p.post_type}">
+    <div class="scribe-type ${t.tag}">${t.label}</div>
+    <div class="scribe-body">${p.content}</div>
+    <div class="scribe-time">${timeAgo(p.created_at)}</div>
+  </div>`
+}).join('')
+
+document.getElementById('statPosts').textContent = MOCK_POSTS.length
+document.getElementById('statScribe').textContent = MOCK_SCRIBE.length
+
+// Panel switching
+function showPanel(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'))
+  document.getElementById('panel-'+id).classList.add('active')
+  el.classList.add('active')
+}
+
+// Collab modal
+function openCollabModal(){
+  document.getElementById('collabModal').classList.add('active')
+}
+function closeCollabModal(){
+  document.getElementById('collabModal').classList.remove('active')
+  document.getElementById('collabMessage').value=''
+  document.getElementById('collabCounter').textContent='0 / 150 words'
+  document.getElementById('sendBtn').disabled=true
+}
+
+document.getElementById('collabMessage').addEventListener('input',function(){
+  const words=this.value.trim()===''?0:this.value.trim().split(/\s+/).length
+  const counter=document.getElementById('collabCounter')
+  counter.textContent=`${words} / 150 words`
+  counter.className=words>150?'modal-counter over':'modal-counter'
+  document.getElementById('sendBtn').disabled=words===0||words>150
+})
+
+function sendCollabRequest(){
+  const msg=document.getElementById('collabMessage').value.trim()
+  if(!msg)return
+  // Store partner and go to collab
+  try{ sessionStorage.setItem('collabPartner',JSON.stringify(builder)) }catch(e){}
+  closeCollabModal()
+  showToast('Request sent ⚡')
+  const btn=document.getElementById('collabBtn')
+  btn.className='btn-collab-main sent'
+  btn.textContent='✓ Request Sent'
+  setTimeout(()=>location.href='/Aetheria/collabs.html',1500)
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast')
+  t.textContent=msg;t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2500)
+}
+</script>
+</body>
+</html>
