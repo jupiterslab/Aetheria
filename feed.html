@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Feed — Aetheria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --jungle-1:#041008;--water:#4ECDC4;--water-2:#2A8A7A;
+  --amber:#D4820A;--gold:#C4944A;--gold-2:#FFD080;--cream:#F0E0C0;
+  --text-1:#F0E8D0;--text-2:rgba(240,232,208,.65);--text-3:rgba(240,232,208,.35);
+  --border:rgba(78,205,196,.12);--card-bg:rgba(6,26,14,.9);
+  --progress:#4ECDC4;--breakthrough:#FFD080;--failure:#E07A5F;--collab-c:#C4944A;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--jungle-1);}
+body{font-family:'Rajdhani',sans-serif;min-height:100vh;background:linear-gradient(180deg,#0A1828 0%,#0A3018 40%,#041008 100%);cursor:none;display:flex;flex-direction:column;}
+.cursor{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--water);box-shadow:0 0 10px rgba(78,205,196,.6);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;}
+.cursor-ring{position:fixed;width:26px;height:26px;border-radius:50%;border:1px solid rgba(78,205,196,.3);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+.top-nav{position:sticky;top:0;z-index:500;background:rgba(4,16,8,.97);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:56px;gap:16px;}
+.nav-logo{font-family:'Cinzel',serif;font-size:18px;font-weight:900;letter-spacing:6px;background:linear-gradient(135deg,var(--cream),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-title{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--text-2);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--water-2),#0A3018);border:1.5px solid rgba(78,205,196,.3);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;overflow:hidden;}
+
+.main{flex:1;max-width:680px;margin:0 auto;width:100%;padding:20px 16px 100px;}
+.post-card{background:var(--card-bg);border:1px solid var(--border);border-radius:2px;margin-bottom:16px;overflow:hidden;position:relative;}
+.post-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+.post-card.progress::before{background:var(--progress);}
+.post-card.breakthrough::before{background:var(--breakthrough);}
+.post-card.failure::before{background:var(--failure);}
+.post-card.collab_ann::before{background:var(--collab-c);}
+.post-inner{padding:18px 18px 14px 22px;}
+.post-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.post-avatar{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(78,205,196,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;background:rgba(10,48,24,.8);}
+.post-meta{flex:1;min-width:0;}
+.post-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
+.post-info{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.post-project{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--gold);font-weight:600;letter-spacing:1px;}
+.post-time{font-size:11px;color:var(--text-3);}
+.post-type-tag{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid;display:inline-block;flex-shrink:0;}
+.tag-p{color:var(--progress);border-color:rgba(78,205,196,.3);background:rgba(78,205,196,.06);}
+.tag-b{color:var(--breakthrough);border-color:rgba(255,208,128,.3);background:rgba(255,208,128,.06);}
+.tag-f{color:var(--failure);border-color:rgba(224,122,95,.3);background:rgba(224,122,95,.06);}
+.tag-c{color:var(--collab-c);border-color:rgba(196,148,74,.3);background:rgba(196,148,74,.06);}
+.post-body{font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+.post-actions{display:flex;border-top:1px solid rgba(78,205,196,.06);padding-top:10px;}
+.post-action{display:flex;align-items:center;gap:6px;font-family:'Cinzel',serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);border:none;background:transparent;cursor:pointer;padding:4px 14px 4px 0;transition:color .2s;}
+.post-action:hover{color:var(--water);}
+.collab-banner{background:linear-gradient(135deg,rgba(196,148,74,.08),rgba(78,205,196,.05));border-top:1px solid rgba(196,148,74,.1);padding:12px 22px;display:flex;align-items:center;gap:12px;}
+.collab-avatars{display:flex;}
+.collab-av{width:30px;height:30px;border-radius:50%;border:2px solid rgba(196,148,74,.3);background:rgba(10,48,24,.8);display:flex;align-items:center;justify-content:center;font-size:13px;}
+.collab-av:last-child{margin-left:-8px;}
+.collab-text{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--gold);}
+.compose-btn{position:fixed;bottom:80px;right:20px;z-index:400;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--water),var(--water-2));border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(78,205,196,.4);transition:transform .2s;}
+.compose-btn:hover{transform:scale(1.1);}
+.modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(4,16,8,.85);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{width:100%;max-width:680px;background:rgba(4,16,8,.98);border:1px solid var(--border);border-top:2px solid var(--water);border-radius:2px 2px 0 0;padding:24px;animation:mu .3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes mu{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--text-1);margin-bottom:4px;}
+.modal-sub{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--text-3);margin-bottom:20px;}
+.modal-field{margin-bottom:16px;}
+.modal-label{display:block;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text-2);margin-bottom:6px;}
+.modal-input{width:100%;background:rgba(10,48,24,.7);border:1px solid var(--border);border-radius:2px;padding:11px 13px;font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--text-1);outline:none;transition:border-color .2s;}
+.modal-input::placeholder{color:var(--text-3);}
+.modal-input:focus{border-color:rgba(78,205,196,.4);}
+textarea.modal-input{resize:vertical;min-height:100px;line-height:1.65;}
+.type-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.type-opt{padding:12px;border-radius:2px;border:1px solid var(--border);cursor:pointer;transition:all .2s;text-align:center;background:rgba(10,48,24,.4);}
+.type-opt.selected{border-color:var(--water);background:rgba(78,205,196,.08);}
+.type-opt-icon{font-size:20px;margin-bottom:4px;}
+.type-opt-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-2);display:block;}
+.type-opt.selected .type-opt-lbl{color:var(--water);}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+.btn-post{flex:1;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#04100A;background:linear-gradient(135deg,var(--water),var(--water-2));border:none;border-radius:2px;padding:15px;cursor:pointer;transition:all .2s;}
+.btn-post:disabled{opacity:.4;cursor:not-allowed;}
+.btn-cancel{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--text-3);background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:2px;padding:15px 20px;cursor:pointer;}
+.empty-state{text-align:center;padding:60px 24px;}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--text-2);margin-bottom:8px;}
+.empty-sub{font-size:14px;color:var(--text-3);}
+.toast{position:fixed;top:66px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:900;background:rgba(10,48,24,.95);border:1px solid rgba(78,205,196,.3);border-radius:2px;padding:10px 22px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--water);opacity:0;transition:all .3s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(4,16,8,.97);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 12px;}
+.bottom-tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 16px;cursor:pointer;border:none;background:transparent;}
+.bottom-tab-icon{font-size:20px;line-height:1;}
+.bottom-tab-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);}
+.bottom-tab.active .bottom-tab-label{color:var(--water);}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="cursor" id="C"></div>
+<div class="cursor-ring" id="CR"></div>
+<div class="toast" id="toast"></div>
+
+<nav class="top-nav">
+  <div class="nav-logo">AETHERIA</div>
+  <div class="nav-title">The Feed</div>
+  <div class="nav-right">
+    <div class="nav-avatar" id="navAvatar">🌍</div>
+  </div>
+</nav>
+
+
+
+<div class="main">
+  <div id="feedPosts"></div>
+</div>
+
+<button class="compose-btn" onclick="openCompose()" title="Share your build">✦</button>
+
+<div class="modal-overlay" id="composeModal">
+  <div class="modal">
+    <div class="modal-title">Share Your Build</div>
+    <div class="modal-sub">Proof of work only. What did you actually do?</div>
+    <div class="modal-field">
+      <div class="modal-label">Post Type</div>
+      <div class="type-selector">
+        <div class="type-opt selected" data-type="progress_update" onclick="selectType(this)"><div class="type-opt-icon">⚡</div><span class="type-opt-lbl">Progress</span></div>
+        <div class="type-opt" data-type="breakthrough" onclick="selectType(this)"><div class="type-opt-icon">💡</div><span class="type-opt-lbl">Breakthrough</span></div>
+        <div class="type-opt" data-type="lessons_from_failure" onclick="selectType(this)"><div class="type-opt-icon">🔥</div><span class="type-opt-lbl">Lessons</span></div>
+        <div class="type-opt" data-type="collab_announcement" onclick="selectType(this)"><div class="type-opt-icon">🤝</div><span class="type-opt-lbl">Collab</span></div>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label" for="postProject">Which project? *</label>
+      <input class="modal-input" type="text" id="postProject" placeholder="Name your project">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label" for="postContent">What happened? *</label>
+      <textarea class="modal-input" id="postContent" rows="5" placeholder="Share what you built, learned, or accomplished."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCompose()">Cancel</button>
+      <button class="btn-post" id="postBtn" onclick="submitPost()">✦ Post</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="bottom-tab" onclick="location.href='/Aetheria/dashboard.html'"><div class="bottom-tab-icon">🌍</div><div class="bottom-tab-label">Aetheria</div></button>
+  <button class="bottom-tab active"><div class="bottom-tab-icon">✦</div><div class="bottom-tab-label">Feed</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/scribe.html'"><div class="bottom-tab-icon">📜</div><div class="bottom-tab-label">Scribe</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/collab.html'"><div class="bottom-tab-icon">💬</div><div class="bottom-tab-label">Collabs</div></button>
+  <button class="bottom-tab" onclick="location.href='/Aetheria/profile.html'"><div class="bottom-tab-icon">◎</div><div class="bottom-tab-label">Profile</div></button>
+</nav>
+
+<script>
+// ── NO MODULE — avoids scope issues entirely ──
+
+const SUPABASE_URL = 'https://fenilyhufciuonhldpxo.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlbmlseWh1ZmNpdW9uaGxkcHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzgwNzQsImV4cCI6MjA5NDQxNDA3NH0.8_NWxnOMhOyhCXSTbdmQ7bR562cH6b74Vz4DO_73CYI'
+
+// Cursor
+const C=document.getElementById('C'),CR=document.getElementById('CR')
+let mx=0,my=0,rx=0,ry=0
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px'})
+;(function aR(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;CR.style.left=rx+'px';CR.style.top=ry+'px';requestAnimationFrame(aR)})()
+
+// State
+let selectedPostType = 'progress_update'
+let currentUser = null
+
+// Mock posts — show immediately, replaced by real data if available
+const MOCK = [
+  {id:'m1',post_type:'breakthrough',project_name:'Plastic to Fuel Converter',content:'After 8 months of testing we finally hit 94% conversion efficiency on mixed plastic waste. One ton of plastic now produces roughly 850 liters of usable fuel. The implications for coastal communities without waste infrastructure are massive. We are ready to scale.',created_at:new Date(Date.now()-3600000).toISOString(),users:{name:'Julian B.',profile_photo:null,location_city:'Atlanta',location_country:'USA'}},
+  {id:'m2',post_type:'progress_update',project_name:'Atmospheric Water Generator',content:'Deployed unit #47 in Navajo Nation. Producing 300 gallons per day from air humidity alone. Zero infrastructure required. The community has not had reliable clean water access in over a decade. This is why we build.',created_at:new Date(Date.now()-7200000).toISOString(),users:{name:'Moses W.',profile_photo:null,location_city:'Houston',location_country:'USA'}},
+  {id:'m3',post_type:'lessons_from_failure',project_name:'Soil Regeneration System',content:'Lost 3 months building the wrong thing. We assumed farmers needed a complex IoT sensor network. They needed a simple soil test they could read themselves. Talk to the people you are building for before you build anything. Starting over. No regrets.',created_at:new Date(Date.now()-86400000).toISOString(),users:{name:'Amara K.',profile_photo:null,location_city:'Nairobi',location_country:'Kenya'}},
+  {id:'m4',post_type:'collab_announcement',project_name:'Off-Grid Energy Network',content:'Just connected with a structural engineer who has been solving the same problem from a different angle for 2 years. We found each other on Aetheria last week. Already have a working prototype of something neither of us could have built alone.',created_at:new Date(Date.now()-172800000).toISOString(),users:{name:'Dayo O.',profile_photo:null,location_city:'Lagos',location_country:'Nigeria'}},
+  {id:'m5',post_type:'progress_update',project_name:'Community Health Infrastructure',content:'Trained 40 community health workers in rural Guatemala this week. Each one now serves 200 people. No clinic. No hospital. Just knowledge and a solar-powered diagnostic kit. Healthcare does not have to look the way we were taught it does.',created_at:new Date(Date.now()-259200000).toISOString(),users:{name:'Dr. Sofia M.',profile_photo:null,location_city:'Guatemala City',location_country:'Guatemala'}}
+]
+
+const TYPE = {
+  progress_update:{label:'Progress',cls:'progress',tag:'tag-p'},
+  breakthrough:{label:'Breakthrough',cls:'breakthrough',tag:'tag-b'},
+  lessons_from_failure:{label:'Lessons',cls:'failure',tag:'tag-f'},
+  collab_announcement:{label:'Collab',cls:'collab_ann',tag:'tag-c'}
+}
+
+function timeAgo(d){
+  const m=Math.floor((Date.now()-new Date(d))/60000)
+  if(m<60)return m+'m ago'
+  const h=Math.floor(m/60)
+  if(h<24)return h+'h ago'
+  return Math.floor(h/24)+'d ago'
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+
+function renderPost(p){
+  const u=p.users||{}
+  const av=u.profile_photo?`<img src="${u.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:'🌍'
+  const t=TYPE[p.post_type]||TYPE.progress_update
+  return `
+    <div class="post-card ${t.cls}">
+      <div class="post-inner">
+        <div class="post-header">
+          <div class="post-avatar">${av}</div>
+          <div class="post-meta">
+            <div class="post-name">${u.name||'Builder'}</div>
+            <div class="post-info">
+              <span class="post-project">▸ ${p.project_name}</span>
+              <span class="post-time">${timeAgo(p.created_at)}</span>
+            </div>
+          </div>
+          <div class="post-type-tag ${t.tag}">${t.label}</div>
+        </div>
+        <div class="post-body">${esc(p.content)}</div>
+        <div class="post-actions">
+          <button class="post-action">💬 Reply</button>
+          <button class="post-action">↗ Amplify</button>
+          <button class="post-action">◎ Profile</button>
+        </div>
+      </div>
+      ${p.post_type==='collab_announcement'?`<div class="collab-banner"><div class="collab-avatars"><div class="collab-av">${av}</div><div class="collab-av">🌍</div></div><div class="collab-text">Two builders just connected. Something is being built.</div></div>`:''}
+    </div>`
+}
+
+function renderFeed(posts){
+  const el=document.getElementById('feedPosts')
+  el.innerHTML=posts.length?posts.map(renderPost).join(''):`<div class="empty-state"><div class="empty-title">No posts here yet.</div><div class="empty-sub">Be the first to share your build.</div></div>`
+}
+
+// Show mock posts immediately on page load
+renderFeed(MOCK)
+
+// Then try to load real posts
+async function loadReal(){
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/feed_posts?select=*,users(id,name,profile_photo,location_city,location_country,impact_area)&order=created_at.desc&limit=30`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+    })
+    const data = await res.json()
+    if(Array.isArray(data)&&data.length>0) renderFeed(data)
+  } catch(e){ /* keep mock posts */ }
+}
+loadReal()
+
+
+
+// Compose
+function openCompose(){ document.getElementById('composeModal').classList.add('active') }
+function closeCompose(){
+  document.getElementById('composeModal').classList.remove('active')
+  document.getElementById('postContent').value=''
+  document.getElementById('postProject').value=''
+}
+function selectType(el){
+  document.querySelectorAll('.type-opt').forEach(o=>o.classList.remove('selected'))
+  el.classList.add('selected')
+  selectedPostType=el.dataset.type
+}
+
+async function submitPost(){
+  const content=document.getElementById('postContent').value.trim()
+  const project=document.getElementById('postProject').value.trim()
+  if(!project){showToast('Project name required');return}
+  if(!content){showToast('Tell us what happened');return}
+  const btn=document.getElementById('postBtn')
+  btn.disabled=true;btn.textContent='Posting...'
+  try {
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/feed_posts`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({user_id:currentUser||'demo',post_type:selectedPostType,project_name:project,content})
+    })
+    closeCompose()
+    showToast('Posted ✦')
+    loadReal()
+  } catch(e){ showToast('Something went wrong') }
+  btn.disabled=false;btn.textContent='✦ Post'
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast')
+  t.textContent=msg;t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2500)
+}
+
+// Try to get current user in background
+;(async()=>{
+  try {
+    const res=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}})
+    const u=await res.json()
+    if(u&&u.id){
+      currentUser=u.id
+      if(u.profile_photo){
+        document.getElementById('navAvatar').innerHTML=`<img src="${u.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+      }
+    }
+  } catch(e){}
+})()
+</script>
+</body>
+</html>
